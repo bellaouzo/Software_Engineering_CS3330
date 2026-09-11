@@ -1,0 +1,1 @@
+-- Seed data after the schema is decided
