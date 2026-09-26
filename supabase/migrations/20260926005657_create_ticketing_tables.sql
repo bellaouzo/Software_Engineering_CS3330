@@ -1,5 +1,3 @@
--- Ticketing schema: profiles, tickets, and comments.
-
 create schema if not exists private;
 
 revoke all on schema private from public;
@@ -8,6 +6,7 @@ grant usage on schema private to authenticated;
 create table public.profiles (
   id uuid primary key references auth.users (id) on delete cascade,
   name text,
+  email text,
   role text not null default 'requester' constraint profiles_role_check check (role in ('requester', 'staff'))
 );
 
@@ -61,10 +60,11 @@ security definer
 set search_path = public
 as $$
 begin
-  insert into public.profiles (id, name)
+  insert into public.profiles (id, name, email)
   values (
     new.id,
-    nullif(new.raw_user_meta_data ->> 'name', '')
+    nullif(new.raw_user_meta_data ->> 'name', ''),
+    new.email
   );
   return new;
 end;
@@ -93,7 +93,7 @@ revoke all on function public.handle_new_user() from public, anon, authenticated
 revoke all on function public.set_tickets_updated_at() from public, anon, authenticated;
 
 grant select on public.profiles to authenticated;
-grant update (name) on public.profiles to authenticated;
+grant update (name, email) on public.profiles to authenticated;
 grant select, insert, update, delete on public.profiles to service_role;
 
 grant select, insert, update on public.tickets to authenticated;
