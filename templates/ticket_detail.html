@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block title %}Ticket · Facilities desk{% endblock %}
+
+{% block content %}
+  <h1>Ticket</h1>
+  <p class="lede">Reference {{ ticket_id }}</p>
+  <div class="sheet">
+    <p>Ticket details will show here once this page is connected to the database.</p>
+  </div>
+  <form class="sheet comment-form" method="post" action="{{ url_for('tickets.ticket_detail', ticket_id=ticket_id) }}">
+    <label for="text">Comment</label>
+    <textarea id="text" name="text" rows="3" required></textarea>
+    <button type="submit">Add comment</button>
+  </form>
+{% endblock %}

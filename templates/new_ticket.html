@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block title %}New ticket · Facilities desk{% endblock %}
+
+{% block content %}
+  <h1>New ticket</h1>
+  <form class="sheet" method="post" action="{{ url_for('tickets.new_ticket') }}">
+    <label for="title">Title</label>
+    <input id="title" name="title" type="text" required autofocus>
+
+    <label for="description">Description</label>
+    <textarea id="description" name="description" rows="4"></textarea>
+
+    <label for="location">Location</label>
+    <input id="location" name="location" type="text">
+
+    <label for="category">Category</label>
+    <input id="category" name="category" type="text">
+
+    <button type="submit">Submit ticket</button>
+  </form>
+{% endblock %}

@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard · Facilities desk{% endblock %}
+
+{% block content %}
+  <h1>Maintenance tickets</h1>
+  <p class="lede">Report a problem on campus and follow what happens next.</p>
+  <div class="actions">
+    <a class="button" href="{{ url_for('tickets.new_ticket') }}">New ticket</a>
+    <a class="button button-quiet" href="{{ url_for('tickets.list_tickets') }}">View tickets</a>
+  </div>
+{% endblock %}

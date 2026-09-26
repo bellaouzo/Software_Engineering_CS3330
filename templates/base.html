@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Facilities desk{% endblock %}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/app.css') }}">
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="{{ url_for('dashboard.home') }}">Facilities desk</a>
+    <nav>
+      <a href="{{ url_for('dashboard.home') }}" {% if request.endpoint == 'dashboard.home' %}aria-current="page"{% endif %}>Dashboard</a>
+      <a href="{{ url_for('tickets.list_tickets') }}" {% if request.endpoint == 'tickets.list_tickets' %}aria-current="page"{% endif %}>Tickets</a>
+      <a href="{{ url_for('tickets.new_ticket') }}" {% if request.endpoint == 'tickets.new_ticket' %}aria-current="page"{% endif %}>New ticket</a>
+      <a href="{{ url_for('auth.login') }}" {% if request.endpoint == 'auth.login' %}aria-current="page"{% endif %}>Log in</a>
+    </nav>
+  </header>
+  <main>
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        <div class="flash" role="status">
+          {% for message in messages %}
+            <p>{{ message }}</p>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+    {% block content %}{% endblock %}
+  </main>
+  <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>

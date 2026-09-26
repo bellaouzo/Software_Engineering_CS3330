@@ -1,0 +1,186 @@
+:root {
+  --paper: #e4ebf0;
+  --sheet: #f7fafb;
+  --ink: #17202a;
+  --muted: #52616d;
+  --line: #c3cfd6;
+  --sign: #142029;
+  --stamp: #c4512c;
+  --stamp-ink: #fff8f4;
+  --focus: #1f6f8b;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: "Barlow", "Segoe UI", sans-serif;
+  font-size: 1.05rem;
+  line-height: 1.45;
+}
+
+a {
+  color: var(--focus);
+}
+
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.9rem 1.4rem;
+  background: var(--sign);
+  color: #f4f7f8;
+}
+
+.brand {
+  color: inherit;
+  font-size: 1.2rem;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem 1rem;
+}
+
+nav a {
+  color: #d5e0e6;
+  text-decoration: none;
+}
+
+nav a[aria-current="page"] {
+  color: white;
+  box-shadow: inset 0 -2px 0 var(--stamp);
+}
+
+main {
+  width: min(880px, calc(100% - 2rem));
+  margin: 0 auto;
+  padding: 2rem 0 4rem;
+}
+
+h1 {
+  margin: 0 0 0.4rem;
+  font-size: 2rem;
+  font-weight: 600;
+  line-height: 1.15;
+}
+
+.lede,
+.aside {
+  max-width: 38rem;
+  color: var(--muted);
+}
+
+.sheet {
+  margin-top: 1.25rem;
+  padding: 1.2rem;
+  background: var(--sheet);
+  border: 1px solid var(--line);
+}
+
+.narrow {
+  max-width: 28rem;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 1.4rem;
+}
+
+label {
+  display: block;
+  margin-top: 0.95rem;
+  font-weight: 500;
+}
+
+input,
+textarea {
+  width: 100%;
+  margin-top: 0.3rem;
+  padding: 0.55rem 0.65rem;
+  border: 1px solid var(--line);
+  background: white;
+  color: var(--ink);
+  font: inherit;
+}
+
+button,
+.button {
+  display: inline-block;
+  margin-top: 1.1rem;
+  padding: 0.55rem 0.9rem;
+  border: 0;
+  background: var(--stamp);
+  color: var(--stamp-ink);
+  font: inherit;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.button-quiet {
+  background: transparent;
+  color: var(--ink);
+  box-shadow: inset 0 0 0 1px var(--line);
+}
+
+.flash {
+  margin-bottom: 1rem;
+  padding: 0.7rem 0.9rem;
+  background: #fff4d8;
+  border: 1px solid #e2c57a;
+}
+
+.flash p {
+  margin: 0;
+}
+
+.flash p + p {
+  margin-top: 0.35rem;
+}
+
+.ticket-list {
+  margin: 1.25rem 0 0;
+  padding: 0;
+  list-style: none;
+  background: var(--sheet);
+  border: 1px solid var(--line);
+}
+
+.ticket-list li {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.8rem 1rem;
+  border-top: 1px solid var(--line);
+}
+
+.ticket-list li:first-child {
+  border-top: 0;
+}
+
+.comment-form {
+  margin-top: 1rem;
+}
+
+:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+
+@media (max-width: 640px) {
+  .topbar {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}

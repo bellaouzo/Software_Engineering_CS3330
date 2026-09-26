@@ -1,1 +1,2 @@
--- Seed data after the schema is decided
+-- Profiles are created from auth.users by handle_new_user.
+-- Seed tickets and comments here after those users exist.

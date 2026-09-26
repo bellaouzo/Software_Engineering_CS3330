@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block title %}Tickets · Facilities desk{% endblock %}
+
+{% block content %}
+  <h1>Tickets</h1>
+  {% if tickets %}
+    <ul class="ticket-list">
+      {% for ticket in tickets %}
+        <li>
+          <a href="{{ url_for('tickets.ticket_detail', ticket_id=ticket.id) }}">{{ ticket.title }}</a>
+          <span>{{ ticket.status }}</span>
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <div class="sheet">
+      <p>No tickets yet.</p>
+      <a class="button" href="{{ url_for('tickets.new_ticket') }}">Open a ticket</a>
+    </div>
+  {% endif %}
+{% endblock %}
