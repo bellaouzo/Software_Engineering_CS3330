@@ -268,7 +268,7 @@ def start_local_db():
     info("  (someone changed the database, e.g. added a column).")
     info(f"  {yellow('Say no')} to keep the test accounts and tickets you already made.")
     info(dim("It only affects the local copy on your computer, never the live database."))
-    if ask_yes_no("Reset the local database?", default=not was_running):
+    if ask_yes_no("Rebuild the local database now? (erases local test data, reloads sample data)", default=not was_running):
         print()
         if run(sb + ["db", "reset"]).returncode != 0:
             fail("Database reset failed. Scroll up for the error.")
