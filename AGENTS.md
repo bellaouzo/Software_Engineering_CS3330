@@ -12,7 +12,9 @@ Engineering). Two roles: **Requester** (submits and tracks tickets) and **Staff*
 - **Jinja2** (built into Flask) for server-rendered HTML templates
 - **Supabase** (hosted Postgres + Auth) for the database and login
 - **Render** for hosting/deployment (auto-deploys from GitHub)
-- Plain HTML/CSS/JS in the browser — no frontend framework (React, Vue, etc.)
+- Raw HTML/CSS/JS in the browser — no frontend framework (React, Vue, etc.) and
+  no CSS framework or library either (Bootstrap, Pico.css, Tailwind, etc.).
+  Write our own CSS in `static/css/app.css`.
 
 ## Setup & running locally
 
@@ -62,6 +64,7 @@ supabase/
   migrations/             # Timestamp-named SQL migrations - the source of truth for schema
   seed.sql                 # Seed data (tickets/comments) - profiles come from auth triggers
   config.toml
+docs/                    # Team documents (Word docs, PDFs, spreadsheets) - not code
 ```
 
 Routes are registered as **Blueprints**, not flat route files — each blueprint
@@ -108,6 +111,12 @@ it's being tracked deliberately.
 - No separate "status history" table — status changes just update `tickets.status`
   and `tickets.updated_at` directly. Historical notes belong in `comments`, not a
   new table.
+- Users log in with a **username and password**, not an email. The current login
+  and register templates/routes still use an email field and need to be updated.
+  Supabase Auth is email-based by default, so how usernames are stored and mapped
+  (e.g. a `username` column on `profiles`) is **not decided yet** — confirm the
+  approach with the team before changing the schema or inventing one. Any schema
+  change goes in a new migration.
 - When implementing a requirement, reference its ID from the requirements  
   spreadsheet in the commit message or PR description (e.g. "Implements 2.1.1").
 
@@ -248,8 +257,9 @@ means the work needs to be on a feature branch and go through a PR.
 
 - Never commit `.env`, API keys, or Supabase credentials — use environment
   variables only.
-- Don't add a frontend JS framework (React/Vue/etc.) — this project is
-  server-rendered by design.
+- Don't add a frontend JS framework (React/Vue/etc.) or a CSS framework/library
+  (Bootstrap, Pico.css, Tailwind, etc.) — this project is server-rendered with
+  raw HTML/CSS/JS by design.
 - Don't merge directly to `main` — open a pull request and get it reviewed by
   your cross-functional testing pair first.
 - Don't alter existing migrations after they've been applied — add a new
