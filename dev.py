@@ -261,11 +261,14 @@ def start_local_db():
             raise SystemExit(1)
         ok("Local Supabase started")
 
-    if ask_yes_no(
-        "Reset the local database to match supabase/migrations + seed.sql?"
-        + ("" if not was_running else " (wipes local data)"),
-        default=not was_running,
-    ):
+    print()
+    info("A reset rebuilds your local database from scratch using the project's")
+    info("latest database files, then adds the sample data.")
+    info(f"  {green('Say yes')} if this is your first time, or you just pulled new changes")
+    info("  (someone changed the database, e.g. added a column).")
+    info(f"  {yellow('Say no')} to keep the test accounts and tickets you already made.")
+    info(dim("It only affects the local copy on your computer, never the live database."))
+    if ask_yes_no("Reset the local database?", default=not was_running):
         print()
         if run(sb + ["db", "reset"]).returncode != 0:
             fail("Database reset failed. Scroll up for the error.")
