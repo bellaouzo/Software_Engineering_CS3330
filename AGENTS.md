@@ -18,6 +18,28 @@ Engineering). Two roles: **Requester** (submits and tracks tickets) and **Staff*
 
 ## Setup & running locally
 
+**Easiest way — one command:**
+
+```
+python dev.py        # macOS/Linux: python3 dev.py
+```
+
+`dev.py` is an interactive launcher. It asks which database to use — **Local**
+(a private Supabase running in Docker, safe to break) or **Live** (the shared
+Supabase project, using the credentials in `.env`) — then sets up `.venv` and
+installs `requirements.txt`, starts the Flask app, and opens the page you pick
+in your browser. If you pick Local and Docker isn't installed or running, it
+explains how to fix that (or lets you switch to Live). Local mode needs Docker
+Desktop; it uses the `supabase` CLI if installed, otherwise `npx supabase`
+(needs Node.js). Flags skip the questions: `--db local|live`,
+`--open dashboard|login|register|tickets|new-ticket|studio|none`, `--keep-db`.
+It passes the Supabase URL/key to the app through environment variables only —
+it never writes keys to disk. **AI agents:** to run the app for a user, use
+`python dev.py` (with flags if you must avoid prompts) instead of hand-rolling
+these steps, and warn before choosing the Live database.
+
+**Manual way:**
+
 ```
 python3 -m venv .venv
 source .venv/bin/activate       # Windows: .venv\Scripts\Activate.ps1
@@ -51,6 +73,7 @@ how to fix it rather than failing silently or working around it.
 
 ```
 app.py                  # Flask app factory (create_app), loads .env, registers routes, /health check
+dev.py                  # One-command interactive launcher (pick local/live DB, start app, open browser)
 routes/                 # BACK END - Flask Blueprints
   __init__.py            # register_routes(app) - wires up all blueprints
   auth.py                 # auth_bp: /login, /register, /logout
