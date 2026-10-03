@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+{# Head: page metadata, per-page title block, Barlow font from Google Fonts, and the app stylesheet #}
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -10,6 +11,8 @@
   <link rel="stylesheet" href="{{ url_for('static', filename='css/app.css') }}">
 </head>
 <body>
+  {# Header (.topbar): brand link plus main nav. The link matching the current
+     route gets aria-current="page", which the CSS styles as the active tab #}
   <header class="topbar">
     <a class="brand" href="{{ url_for('dashboard.home') }}">Facilities desk</a>
     <nav>

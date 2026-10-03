@@ -1,15 +1,25 @@
+/* ==========================================================================
+   Ticket Tracker – Main Stylesheet
+   Light "paper and ink" theme with a dark top bar and a rust-orange accent.
+   Sections: tokens → base → layout → components → states → responsive
+   ========================================================================== */
+
+/* ---------- Design tokens (colors) ---------- */
 :root {
-  --paper: #e4ebf0;
-  --sheet: #f7fafb;
-  --ink: #17202a;
-  --muted: #52616d;
-  --line: #c3cfd6;
-  --sign: #142029;
-  --stamp: #c4512c;
-  --stamp-ink: #fff8f4;
-  --focus: #1f6f8b;
+  --paper: #e4ebf0;      /* page background */
+  --sheet: #f7fafb;      /* card/panel background, slightly lighter than page */
+  --ink: #17202a;        /* primary text */
+  --muted: #52616d;      /* secondary text (ledes, asides) */
+  --line: #c3cfd6;       /* borders and dividers */
+  --sign: #142029;       /* dark top bar background */
+  --stamp: #c4512c;      /* accent: buttons and active-nav underline */
+  --stamp-ink: #fff8f4;  /* text color on top of the accent */
+  --focus: #1f6f8b;      /* links and keyboard focus ring */
 }
 
+/* ---------- Base / reset ---------- */
+
+/* Include padding and border in element widths so sizing is predictable */
 * {
   box-sizing: border-box;
 }
@@ -18,7 +28,7 @@ body {
   margin: 0;
   background: var(--paper);
   color: var(--ink);
-  font-family: "Barlow", "Segoe UI", sans-serif;
+  font-family: "Barlow", "Segoe UI", sans-serif; /* Barlow if loaded, else system fallback */
   font-size: 1.05rem;
   line-height: 1.45;
 }
@@ -27,6 +37,7 @@ a {
   color: var(--focus);
 }
 
+/* ---------- Top bar & navigation ---------- */
 .topbar {
   display: flex;
   justify-content: space-between;
@@ -38,7 +49,7 @@ a {
 }
 
 .brand {
-  color: inherit;
+  color: inherit;            /* inherit light text from .topbar instead of link blue */
   font-size: 1.2rem;
   font-weight: 600;
   text-decoration: none;
@@ -46,8 +57,8 @@ a {
 
 nav {
   display: flex;
-  flex-wrap: wrap;
-  gap: 0.35rem 1rem;
+  flex-wrap: wrap;           /* let links wrap on narrow screens */
+  gap: 0.35rem 1rem;         /* row gap, column gap */
 }
 
 nav a {
@@ -55,11 +66,16 @@ nav a {
   text-decoration: none;
 }
 
+/* Current page indicator: accent underline drawn with an inset shadow
+   (avoids shifting layout the way a real border would) */
 nav a[aria-current="page"] {
   color: white;
   box-shadow: inset 0 -2px 0 var(--stamp);
 }
 
+/* ---------- Page layout ---------- */
+
+/* Centered content column: max 880px, but always keeps 1rem side margins on small screens */
 main {
   width: min(880px, calc(100% - 2rem));
   margin: 0 auto;
@@ -70,15 +86,19 @@ h1 {
   margin: 0 0 0.4rem;
   font-size: 2rem;
   font-weight: 600;
-  line-height: 1.15;
+  line-height: 1.15;         /* tighter leading suits large headings */
 }
 
+/* Intro paragraph and side notes: muted, capped to a readable line length */
 .lede,
 .aside {
   max-width: 38rem;
   color: var(--muted);
 }
 
+/* ---------- Panels & forms ---------- */
+
+/* Card-style container */
 .sheet {
   margin-top: 1.25rem;
   padding: 1.2rem;
@@ -86,10 +106,12 @@ h1 {
   border: 1px solid var(--line);
 }
 
+/* Modifier: constrains a .sheet (e.g. login form) to a narrower width */
 .narrow {
   max-width: 28rem;
 }
 
+/* Row of buttons/links with wrapping */
 .actions {
   display: flex;
   flex-wrap: wrap;
@@ -98,7 +120,7 @@ h1 {
 }
 
 label {
-  display: block;
+  display: block;            /* stack label above its input */
   margin-top: 0.95rem;
   font-weight: 500;
 }
@@ -111,9 +133,12 @@ textarea {
   border: 1px solid var(--line);
   background: white;
   color: var(--ink);
-  font: inherit;
+  font: inherit;             /* form controls don't inherit fonts by default */
 }
 
+/* ---------- Buttons ---------- */
+
+/* .button lets links (<a>) look identical to real <button> elements */
 button,
 .button {
   display: inline-block;
@@ -124,31 +149,37 @@ button,
   color: var(--stamp-ink);
   font: inherit;
   font-weight: 600;
-  text-decoration: none;
+  text-decoration: none;     /* needed when applied to <a> */
   cursor: pointer;
 }
 
+/* Secondary/outline variant: transparent with a 1px inset border */
 .button-quiet {
   background: transparent;
   color: var(--ink);
   box-shadow: inset 0 0 0 1px var(--line);
 }
 
+/* ---------- Flash messages (notices/alerts) ---------- */
 .flash {
   margin-bottom: 1rem;
   padding: 0.7rem 0.9rem;
-  background: #fff4d8;
+  background: #fff4d8;       /* soft yellow notice */
   border: 1px solid #e2c57a;
 }
 
 .flash p {
-  margin: 0;
+  margin: 0;                 /* spacing handled by the sibling rule below */
 }
 
+/* Add space only between consecutive messages */
 .flash p + p {
   margin-top: 0.35rem;
 }
 
+/* ---------- Ticket list ---------- */
+
+/* Strip default list styling; render as a bordered card */
 .ticket-list {
   margin: 1.25rem 0 0;
   padding: 0;
@@ -157,6 +188,7 @@ button,
   border: 1px solid var(--line);
 }
 
+/* Each row: title on the left, metadata/status on the right */
 .ticket-list li {
   display: flex;
   justify-content: space-between;
@@ -165,6 +197,7 @@ button,
   border-top: 1px solid var(--line);
 }
 
+/* No divider above the first row (the list already has an outer border) */
 .ticket-list li:first-child {
   border-top: 0;
 }
@@ -173,11 +206,17 @@ button,
   margin-top: 1rem;
 }
 
+/* ---------- Accessibility ---------- */
+
+/* Visible focus ring for keyboard users only (not on mouse clicks) */
 :focus-visible {
   outline: 2px solid var(--focus);
   outline-offset: 2px;
 }
 
+/* ---------- Responsive ---------- */
+
+/* Stack the brand above the nav on small screens */
 @media (max-width: 640px) {
   .topbar {
     align-items: flex-start;
