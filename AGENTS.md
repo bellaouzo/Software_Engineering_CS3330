@@ -98,7 +98,9 @@ a routes file or Supabase calls in a template.
 
 ## Database schema (Supabase) — source of truth is `supabase/migrations/`
 
-- `profiles`: id (matches Supabase Auth id), name, role ("requester"|"staff").
+- `profiles`: id (matches Supabase Auth id), name, username (unique, lowercase
+  `a-z0-9_`, 3-30 chars; set from signup metadata by `handle_new_user()`),
+  role ("requester"|"staff").
   **No** `email` **column** — it was intentionally dropped (duplicate of Supabase
   Auth's own copy); don't re-add it without a reason.
 - `tickets`: id, title, description, location, category, status, created_by,
