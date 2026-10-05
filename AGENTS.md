@@ -33,7 +33,9 @@ explains how to fix that (or lets you switch to Live). Local mode needs Docker
 Desktop; it uses the `supabase` CLI if installed, otherwise `npx supabase`
 (needs Node.js). Flags skip the questions: `--db local|live`,
 `--open dashboard|login|register|tickets|new-ticket|studio|none`, `--keep-db`.
-It passes the Supabase URL/key to the app through environment variables only —
+When the app exits in Local mode, it asks whether to stop the database
+containers; the default answer is yes (press Enter), and `--keep-db` skips the
+question and leaves them running. It passes the Supabase URL/key to the app through environment variables only —
 it never writes keys to disk. **AI agents:** to run the app for a user, use
 `python dev.py` (with flags if you must avoid prompts) instead of hand-rolling
 these steps, and warn before choosing the Live database.
