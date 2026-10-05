@@ -148,7 +148,7 @@ it's being tracked deliberately.
   `supabase_client.py` so RLS applies. Use `get_supabase_client()` only for
   calls with no logged-in user (login, register). Don't write your own session
   or token handling. Live Supabase setup steps for auth are in
-  `docs/supabase-live-auth-setup.md`.
+  `docs/guides/supabase-live-auth-setup.md`.
 - When implementing a requirement, reference its ID from the requirements  
   spreadsheet in the commit message or PR description (e.g. "Implements 2.1.1").
 
@@ -297,7 +297,8 @@ final commit, update this file and any other affected docs **in the same branch*
 - Setup, env vars, or run steps: update **Setup & running locally** and
   `.env.example`.
 - Anything that needs manual steps on the live Supabase project: add or update a
-  file in `docs/`.
+  Markdown file in `docs/guides/`. Markdown goes in `docs/guides/`; Word docs,
+  PDFs, and spreadsheets stay out of that folder (see `docs/README.md`).
 
 Delete notes that are no longer true instead of leaving them beside the new
 behavior. Say in the commit or PR description which docs were updated.

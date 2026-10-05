@@ -7,9 +7,18 @@ spreadsheets go here.
 This folder holds documentation only. Code, templates, and database migrations
 live in their own folders (see `AGENTS.md`).
 
+## Markdown vs Word docs
+
+Markdown files (`.md`) are for developers and AI tools: setup guides, checklists,
+and notes about how the code works. They live in `guides/` so they diff cleanly
+in Git and AI agents can read them. Word docs, PDFs, and spreadsheets are for
+the class deliverables and stay out of `guides/`.
+
+- `guides/` - Markdown guides, for example `supabase-live-auth-setup.md`
+
 ## Suggested layout
 
-Add subfolders as needed, for example:
+Add subfolders as needed for the Word docs, PDFs, and spreadsheets, for example:
 
 - `requirements/` - requirements spreadsheet and related specs
 - `test-plans/` - one numbered Test Plan per file
