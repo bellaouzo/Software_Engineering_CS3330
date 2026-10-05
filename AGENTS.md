@@ -51,10 +51,6 @@ Requires a local `.env` file (see `.env.example` for the shape) with
 `FLASK_SECRET_KEY`, `SUPABASE_URL`, and `SUPABASE_KEY` — never commit this file.
 Ask a teammate for the real values; do not generate or guess your own.
 
-**Note:** `requirements.txt` does not yet include the `supabase` package
-(supabase-py). Add it when wiring any route to a real Supabase call — nothing
-that imports it will run until it's added.
-
 ### Git & GitHub prerequisites
 
 Everyone (and their AI tool) needs these to use the branch/PR workflow below:
@@ -74,6 +70,7 @@ how to fix it rather than failing silently or working around it.
 ```
 app.py                  # Flask app factory (create_app), loads .env, registers routes, /health check
 dev.py                  # One-command interactive launcher (pick local/live DB, start app, open browser)
+supabase_client.py      # get_supabase_client() - the one place routes get a Supabase client from
 routes/                 # BACK END - Flask Blueprints
   __init__.py            # register_routes(app) - wires up all blueprints
   auth.py                 # auth_bp: /login, /register, /logout
@@ -136,12 +133,14 @@ it's being tracked deliberately.
 - No separate "status history" table — status changes just update `tickets.status`
   and `tickets.updated_at` directly. Historical notes belong in `comments`, not a
   new table.
-- Users log in with a **username and password**, not an email. The current login
-  and register templates/routes still use an email field and need to be updated.
-  Supabase Auth is email-based by default, so how usernames are stored and mapped
-  (e.g. a `username` column on `profiles`) is **not decided yet** — confirm the
-  approach with the team before changing the schema or inventing one. Any schema
-  change goes in a new migration.
+- Users log in with a **username and password**, not an email. Supabase Auth is
+  email-based, so `routes/auth.py` maps each username to a placeholder email
+  (`<username>@tickets.invalid`, never emailed) and passes the username in signup
+  metadata, where `handle_new_user()` copies it to `profiles.username`. Email
+  confirmation must stay **off** in Supabase Auth settings, since the placeholder
+  address can't receive mail. After login the Supabase `user_id`, `access_token`,
+  and `refresh_token` are stored in the Flask `session`. Any schema change goes
+  in a new migration.
 - When implementing a requirement, reference its ID from the requirements  
   spreadsheet in the commit message or PR description (e.g. "Implements 2.1.1").
 
