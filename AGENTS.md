@@ -70,7 +70,8 @@ how to fix it rather than failing silently or working around it.
 ```
 app.py                  # Flask app factory (create_app), loads .env, registers routes, /health check
 dev.py                  # One-command interactive launcher (pick local/live DB, start app, open browser)
-supabase_client.py      # get_supabase_client() - the one place routes get a Supabase client from
+supabase_client.py      # get_supabase_client() (anon) and get_user_client() (acts as the logged-in user, RLS applies)
+auth_helpers.py         # @require_login and @require_staff decorators for route functions
 routes/                 # BACK END - Flask Blueprints
   __init__.py            # register_routes(app) - wires up all blueprints
   auth.py                 # auth_bp: /login, /register, /logout
@@ -141,6 +142,13 @@ it's being tracked deliberately.
   address can't receive mail. After login the Supabase `user_id`, `access_token`,
   and `refresh_token` are stored in the Flask `session`. Any schema change goes
   in a new migration.
+- **Protecting routes and querying as the user:** put `@require_login` (or
+  `@require_staff`) from `auth_helpers.py` under the route decorator. For any
+  table query made on a user's behalf, use `get_user_client()` from
+  `supabase_client.py` so RLS applies. Use `get_supabase_client()` only for
+  calls with no logged-in user (login, register). Don't write your own session
+  or token handling. Live Supabase setup steps for auth are in
+  `docs/supabase-live-auth-setup.md`.
 - When implementing a requirement, reference its ID from the requirements  
   spreadsheet in the commit message or PR description (e.g. "Implements 2.1.1").
 
@@ -276,6 +284,23 @@ means the work needs to be on a feature branch and go through a PR.
   Test Plan template — don't lump multiple tests into one plan.
 - The known RLS issue above should become one of these test cases once the team  
   reaches testing.
+
+## Keeping this file and the docs current
+
+**AI agents:** this file is the shared source of truth for every teammate's AI, so
+a stale entry misleads the whole team. After finishing any change, before the
+final commit, update this file and any other affected docs **in the same branch**:
+
+- New or moved files, helpers, or routes: update **Folder structure**.
+- Schema, RLS, or migration changes: update **Database schema**.
+- New conventions, decisions, or shared helpers: update **Conventions**.
+- Setup, env vars, or run steps: update **Setup & running locally** and
+  `.env.example`.
+- Anything that needs manual steps on the live Supabase project: add or update a
+  file in `docs/`.
+
+Delete notes that are no longer true instead of leaving them beside the new
+behavior. Say in the commit or PR description which docs were updated.
 
 ## Boundaries
 
