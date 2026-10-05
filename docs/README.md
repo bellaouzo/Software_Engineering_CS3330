@@ -14,7 +14,9 @@ and notes about how the code works. They live in `guides/` so they diff cleanly
 in Git and AI agents can read them. Word docs, PDFs, and spreadsheets are for
 the class deliverables and stay out of `guides/`.
 
-- `guides/` - Markdown guides, for example `supabase-live-auth-setup.md`
+- `guides/` - Markdown guides: `supabase-live-auth-setup.md` (live Supabase
+  steps for login) and `auth-helpers-examples.md` (how routes use the login and
+  database helpers)
 
 ## Suggested layout
 

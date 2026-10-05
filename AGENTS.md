@@ -147,8 +147,17 @@ it's being tracked deliberately.
   table query made on a user's behalf, use `get_user_client()` from
   `supabase_client.py` so RLS applies. Use `get_supabase_client()` only for
   calls with no logged-in user (login, register). Don't write your own session
-  or token handling. Live Supabase setup steps for auth are in
-  `docs/guides/supabase-live-auth-setup.md`.
+  or token handling. Full examples (insert, staff-only, error handling) are in
+  `docs/guides/auth-helpers-examples.md`. Live Supabase setup steps for auth are
+  in `docs/guides/supabase-live-auth-setup.md`.
+
+  ```python
+  @tickets_bp.get("/tickets")
+  @require_login          # directly under the route decorator
+  def list_tickets():
+      tickets = get_user_client().table("tickets").select("*").execute().data
+      return render_template("tickets.html", tickets=tickets)
+  ```
 - When implementing a requirement, reference its ID from the requirements  
   spreadsheet in the commit message or PR description (e.g. "Implements 2.1.1").
 
