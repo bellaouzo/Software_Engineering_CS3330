@@ -51,10 +51,6 @@ Requires a local `.env` file (see `.env.example` for the shape) with
 `FLASK_SECRET_KEY`, `SUPABASE_URL`, and `SUPABASE_KEY` — never commit this file.
 Ask a teammate for the real values; do not generate or guess your own.
 
-**Note:** `requirements.txt` does not yet include the `supabase` package
-(supabase-py). Add it when wiring any route to a real Supabase call — nothing
-that imports it will run until it's added.
-
 ### Git & GitHub prerequisites
 
 Everyone (and their AI tool) needs these to use the branch/PR workflow below:
@@ -74,6 +70,8 @@ how to fix it rather than failing silently or working around it.
 ```
 app.py                  # Flask app factory (create_app), loads .env, registers routes, /health check
 dev.py                  # One-command interactive launcher (pick local/live DB, start app, open browser)
+supabase_client.py      # get_supabase_client() (anon) and get_user_client() (acts as the logged-in user, RLS applies)
+auth_helpers.py         # @require_login and @require_staff decorators for route functions
 routes/                 # BACK END - Flask Blueprints
   __init__.py            # register_routes(app) - wires up all blueprints
   auth.py                 # auth_bp: /login, /register, /logout
@@ -98,7 +96,9 @@ a routes file or Supabase calls in a template.
 
 ## Database schema (Supabase) — source of truth is `supabase/migrations/`
 
-- `profiles`: id (matches Supabase Auth id), name, role ("requester"|"staff").
+- `profiles`: id (matches Supabase Auth id), name, username (unique, lowercase
+  `a-z0-9_`, 3-30 chars; set from signup metadata by `handle_new_user()`),
+  role ("requester"|"staff").
   **No** `email` **column** — it was intentionally dropped (duplicate of Supabase
   Auth's own copy); don't re-add it without a reason.
 - `tickets`: id, title, description, location, category, status, created_by,
@@ -134,12 +134,30 @@ it's being tracked deliberately.
 - No separate "status history" table — status changes just update `tickets.status`
   and `tickets.updated_at` directly. Historical notes belong in `comments`, not a
   new table.
-- Users log in with a **username and password**, not an email. The current login
-  and register templates/routes still use an email field and need to be updated.
-  Supabase Auth is email-based by default, so how usernames are stored and mapped
-  (e.g. a `username` column on `profiles`) is **not decided yet** — confirm the
-  approach with the team before changing the schema or inventing one. Any schema
-  change goes in a new migration.
+- Users log in with a **username and password**, not an email. Supabase Auth is
+  email-based, so `routes/auth.py` maps each username to a placeholder email
+  (`<username>@tickets.invalid`, never emailed) and passes the username in signup
+  metadata, where `handle_new_user()` copies it to `profiles.username`. Email
+  confirmation must stay **off** in Supabase Auth settings, since the placeholder
+  address can't receive mail. After login the Supabase `user_id`, `access_token`,
+  and `refresh_token` are stored in the Flask `session`. Any schema change goes
+  in a new migration.
+- **Protecting routes and querying as the user:** put `@require_login` (or
+  `@require_staff`) from `auth_helpers.py` under the route decorator. For any
+  table query made on a user's behalf, use `get_user_client()` from
+  `supabase_client.py` so RLS applies. Use `get_supabase_client()` only for
+  calls with no logged-in user (login, register). Don't write your own session
+  or token handling. Full examples (insert, staff-only, error handling) are in
+  `docs/guides/auth-helpers-examples.md`. Live Supabase setup steps for auth are
+  in `docs/guides/supabase-live-auth-setup.md`.
+
+  ```python
+  @tickets_bp.get("/tickets")
+  @require_login          # directly under the route decorator
+  def list_tickets():
+      tickets = get_user_client().table("tickets").select("*").execute().data
+      return render_template("tickets.html", tickets=tickets)
+  ```
 - When implementing a requirement, reference its ID from the requirements  
   spreadsheet in the commit message or PR description (e.g. "Implements 2.1.1").
 
@@ -275,6 +293,24 @@ means the work needs to be on a feature branch and go through a PR.
   Test Plan template — don't lump multiple tests into one plan.
 - The known RLS issue above should become one of these test cases once the team  
   reaches testing.
+
+## Keeping this file and the docs current
+
+**AI agents:** this file is the shared source of truth for every teammate's AI, so
+a stale entry misleads the whole team. After finishing any change, before the
+final commit, update this file and any other affected docs **in the same branch**:
+
+- New or moved files, helpers, or routes: update **Folder structure**.
+- Schema, RLS, or migration changes: update **Database schema**.
+- New conventions, decisions, or shared helpers: update **Conventions**.
+- Setup, env vars, or run steps: update **Setup & running locally** and
+  `.env.example`.
+- Anything that needs manual steps on the live Supabase project: add or update a
+  Markdown file in `docs/guides/`. Markdown goes in `docs/guides/`; Word docs,
+  PDFs, and spreadsheets stay out of that folder (see `docs/README.md`).
+
+Delete notes that are no longer true instead of leaving them beside the new
+behavior. Say in the commit or PR description which docs were updated.
 
 ## Boundaries
 
