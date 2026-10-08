@@ -424,7 +424,7 @@ def main():
 
     if db_mode == "local" and not args.keep_db:
         print()
-        if ask_yes_no("Stop the local database containers too?", default=False):
+        if ask_yes_no("Stop the local database containers too?", default=True):
             stop_local_db()
         else:
             info("Leaving local Supabase running (stop it later with: supabase stop).")
