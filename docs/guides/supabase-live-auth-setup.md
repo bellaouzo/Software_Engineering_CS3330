@@ -2,7 +2,7 @@
 
 Login and registration use Supabase Auth with a username and password. Supabase
 Auth is email-based, so the app maps each username to a placeholder email
-(`<username>@tickets.invalid`) that never receives mail. Local Supabase
+(`<username>@example.com`) that never receives mail. Local Supabase
 (`python dev.py --db local`) already works this way. The shared **live** project
 needs the steps below once, before anyone registers on it.
 

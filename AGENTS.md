@@ -138,7 +138,7 @@ it's being tracked deliberately.
   new table.
 - Users log in with a **username and password**, not an email. Supabase Auth is
   email-based, so `routes/auth.py` maps each username to a placeholder email
-  (`<username>@tickets.invalid`, never emailed) and passes the username in signup
+  (`<username>@example.com`, never emailed) and passes the username in signup
   metadata, where `handle_new_user()` copies it to `profiles.username`. Email
   confirmation must stay **off** in Supabase Auth settings, since the placeholder
   address can't receive mail. After login the Supabase `user_id`, `access_token`,
