@@ -1,3 +1,4 @@
+import logging
 import re
 
 from flask import Blueprint, flash, redirect, render_template, request, session, url_for
@@ -6,12 +7,14 @@ from supabase import AuthApiError, AuthError, SupabaseException
 from supabase_client import get_supabase_client
 
 auth_bp = Blueprint("auth", __name__)
+logger = logging.getLogger(__name__)
 
 # Matches the profiles_username_format_check constraint in the migrations.
 USERNAME_PATTERN = re.compile(r"^[a-z0-9_]{3,30}$")
 # Supabase Auth needs an email, so each username maps to a placeholder address.
-# Nothing is ever sent to it.
-PLACEHOLDER_EMAIL_DOMAIN = "tickets.invalid"
+# Nothing is ever sent to it ("Confirm email" must stay off in Supabase). Hosted
+# Supabase rejects reserved TLDs like .invalid, but accepts example.com.
+PLACEHOLDER_EMAIL_DOMAIN = "example.com"
 
 # Supabase error code -> (message shown to the user, HTTP status).
 LOGIN_ERRORS = {
@@ -21,6 +24,10 @@ REGISTER_ERRORS = {
     "user_already_exists": ("That username is taken. Pick another one.", 409),
     "email_exists": ("That username is taken. Pick another one.", 409),
     "weak_password": ("That password is too weak. Use a longer one.", 400),
+    "over_email_send_rate_limit": (
+        "Too many sign-ups right now. Try again in a few minutes.",
+        429,
+    ),
 }
 UNKNOWN_ERROR = ("Something went wrong on our end. Try again in a moment.", 502)
 UNREACHABLE_ERROR = ("Could not reach the database. Try again in a moment.", 503)
@@ -32,6 +39,14 @@ def _username_to_email(username):
 
 def _redirect_to_dashboard():
     return redirect(url_for("dashboard.home"))
+
+
+def _lookup_error(errors, error):
+    """Picks the user message for a Supabase error, logging ones we don't map."""
+    if error.code not in errors:
+        logger.error("Unmapped Supabase auth error: code=%s status=%s message=%s",
+                     error.code, error.status, error.message)
+    return errors.get(error.code, UNKNOWN_ERROR)
 
 
 def _login_error(message, status):
@@ -60,7 +75,7 @@ def login():
             {"email": _username_to_email(username), "password": password}
         )
     except AuthApiError as error:
-        return _login_error(*LOGIN_ERRORS.get(error.code, UNKNOWN_ERROR))
+        return _login_error(*_lookup_error(LOGIN_ERRORS, error))
     except (AuthError, SupabaseException):
         return _login_error(*UNREACHABLE_ERROR)
     session["user_id"] = result.user.id
@@ -94,7 +109,7 @@ def register():
             }
         )
     except AuthApiError as error:
-        return _register_error(*REGISTER_ERRORS.get(error.code, UNKNOWN_ERROR))
+        return _register_error(*_lookup_error(REGISTER_ERRORS, error))
     except (AuthError, SupabaseException):
         return _register_error(*UNREACHABLE_ERROR)
     flash("Account created. Log in with your new username.")

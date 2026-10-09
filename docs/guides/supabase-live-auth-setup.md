@@ -2,7 +2,7 @@
 
 Login and registration use Supabase Auth with a username and password. Supabase
 Auth is email-based, so the app maps each username to a placeholder email
-(`<username>@tickets.invalid`) that never receives mail. Local Supabase
+(`<username>@example.com`) that never receives mail. Local Supabase
 (`python dev.py --db local`) already works this way. The shared **live** project
 needs the steps below once, before anyone registers on it.
 
@@ -20,10 +20,10 @@ needs the steps below once, before anyone registers on it.
 3. **Check the password length.** Dashboard > Authentication > Sign In /
    Providers > "Minimum password length". The app shows a "too weak" message when
    Supabase rejects a password, so any value works. Local uses 6.
-4. **Confirm the placeholder email is accepted.** Register one test account on
-   live. If Supabase answers with an invalid-email error, change
-   `PLACEHOLDER_EMAIL_DOMAIN` in `routes/auth.py` to a domain it accepts, and
-   update the matching line in `AGENTS.md`.
+4. **Placeholder email domain.** Hosted Supabase rejects `.invalid` addresses
+   (`email_address_invalid`), so the app uses `example.com`. If registration ever
+   shows "Something went wrong", check the server log: unmapped Supabase error
+   codes are logged with their code and message.
 5. **Do a real pass.** Register a new username, log in with it, confirm
    `profiles` shows the name and username with role `requester`, then try a wrong
    password and a username that is already taken.
