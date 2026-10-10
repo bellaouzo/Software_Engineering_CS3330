@@ -6,16 +6,21 @@
   <h1>New ticket</h1>
   <form class="sheet" method="post" action="{{ url_for('tickets.new_ticket') }}">
     <label for="title">Title</label>
-    <input id="title" name="title" type="text" required autofocus>
+    <input id="title" name="title" type="text" required autofocus value="{{ form.title or '' }}">
 
     <label for="description">Description</label>
-    <textarea id="description" name="description" rows="4"></textarea>
+    <textarea id="description" name="description" rows="4">{{ form.description or '' }}</textarea>
 
     <label for="location">Location</label>
-    <input id="location" name="location" type="text">
+    <input id="location" name="location" type="text" value="{{ form.location or '' }}">
 
     <label for="category">Category</label>
-    <input id="category" name="category" type="text">
+    <select id="category" name="category">
+      <option value="">Choose a category</option>
+      {% for category in categories %}
+        <option value="{{ category }}" {% if form.category == category %}selected{% endif %}>{{ category }}</option>
+      {% endfor %}
+    </select>
 
     <button type="submit">Submit ticket</button>
   </form>

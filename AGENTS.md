@@ -77,7 +77,7 @@ auth_helpers.py         # @require_login and @require_staff decorators for route
 routes/                 # BACK END - Flask Blueprints
   __init__.py            # register_routes(app) - wires up all blueprints
   auth.py                 # auth_bp: /login, /register, /logout
-  tickets.py               # tickets_bp: /tickets, /tickets/new, /tickets/<id>
+  tickets.py               # tickets_bp: /tickets, /tickets/new, /tickets/<id>, POST /tickets/<id>/status (staff)
   dashboard.py              # dashboard_bp: / and /dashboard (both -> home)
 templates/               # FRONT END - HTML + Jinja2, extend base.html
 static/
@@ -126,10 +126,11 @@ it's being tracked deliberately.
 
 - Route functions handle both GET (show a form/page) and POST (process submitted
   data) in one function, per Flask convention — don't split these into two routes.
-- Routes currently not wired to Supabase return a flash message saying so
-  explicitly (e.g. "This ticket was not saved. The database is not connected
-  yet."). When you wire one up, replace the stub flash message, don't leave it
-  alongside real logic.
+- All ticket routes are wired to Supabase. Database errors are caught
+  (`PostgrestAPIError`, `SupabaseException`, `AuthError`) and shown as a plain
+  flash message; an expired login clears the session and goes to `/login`.
+  Ticket categories (Plumbing, Electrical, HVAC, Furniture, Cleaning, Other) are
+  the `TICKET_CATEGORIES` list in `routes/tickets.py`.
 - Ticket status values are exactly: `Submitted`, `Acknowledged`, `In Progress`,
   `Resolved`, `Closed`. Don't introduce new status strings without updating the
   requirements spreadsheet first.
