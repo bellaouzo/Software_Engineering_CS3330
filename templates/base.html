@@ -19,7 +19,14 @@
       <a href="{{ url_for('dashboard.home') }}" {% if request.endpoint == 'dashboard.home' %}aria-current="page"{% endif %}>Dashboard</a>
       <a href="{{ url_for('tickets.list_tickets') }}" {% if request.endpoint == 'tickets.list_tickets' %}aria-current="page"{% endif %}>Tickets</a>
       <a href="{{ url_for('tickets.new_ticket') }}" {% if request.endpoint == 'tickets.new_ticket' %}aria-current="page"{% endif %}>New ticket</a>
-      <a href="{{ url_for('auth.login') }}" {% if request.endpoint == 'auth.login' %}aria-current="page"{% endif %}>Log in</a>
+      {% if session.get('user_id') %}
+        {# /logout only accepts POST, so it is a form with a link-styled button #}
+        <form class="nav-logout" method="post" action="{{ url_for('auth.logout') }}">
+          <button type="submit">Log out</button>
+        </form>
+      {% else %}
+        <a href="{{ url_for('auth.login') }}" {% if request.endpoint == 'auth.login' %}aria-current="page"{% endif %}>Log in</a>
+      {% endif %}
     </nav>
   </header>
   <main>
