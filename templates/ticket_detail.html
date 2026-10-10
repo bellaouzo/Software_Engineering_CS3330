@@ -1,14 +1,56 @@
 {% extends "base.html" %}
 
-{% block title %}Ticket · Facilities desk{% endblock %}
+{% block title %}{{ ticket.title }} · Facilities desk{% endblock %}
 
 {% block content %}
-  <h1>Ticket</h1>
-  <p class="lede">Reference {{ ticket_id }}</p>
+  <h1>{{ ticket.title }}</h1>
+  <p class="lede">
+    <span class="status-badge">{{ ticket.status }}</span>
+    Opened by {{ ticket.profiles.name or ticket.profiles.username if ticket.profiles else 'unknown' }}
+  </p>
+
   <div class="sheet">
-    <p>Ticket details will show here once this page is connected to the database.</p>
+    <dl class="ticket-fields">
+      <dt>Category</dt>
+      <dd>{{ ticket.category or 'Not set' }}</dd>
+      <dt>Location</dt>
+      <dd>{{ ticket.location or 'Not set' }}</dd>
+      <dt>Last updated</dt>
+      <dd>{{ ticket.updated_at[:16].replace('T', ' ') }} UTC</dd>
+    </dl>
+    <p class="ticket-description">{{ ticket.description or 'No description.' }}</p>
   </div>
-  <form class="sheet comment-form" method="post" action="{{ url_for('tickets.ticket_detail', ticket_id=ticket_id) }}">
+
+  {% if is_staff %}
+    <form class="sheet" method="post" action="{{ url_for('tickets.update_ticket_status', ticket_id=ticket.id) }}">
+      <label for="status">Status</label>
+      <select id="status" name="status">
+        {% for status in statuses %}
+          <option value="{{ status }}" {% if ticket.status == status %}selected{% endif %}>{{ status }}</option>
+        {% endfor %}
+      </select>
+      <button type="submit">Update status</button>
+    </form>
+  {% endif %}
+
+  <h2>Comments</h2>
+  {% if comments %}
+    <ul class="comment-list">
+      {% for comment in comments %}
+        <li>
+          <div class="ticket-meta">
+            {{ comment.profiles.name or comment.profiles.username if comment.profiles else 'Unknown' }}
+            · {{ comment.timestamp[:16].replace('T', ' ') }} UTC
+          </div>
+          <p>{{ comment.text }}</p>
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p class="lede">No comments yet.</p>
+  {% endif %}
+
+  <form class="sheet comment-form" method="post" action="{{ url_for('tickets.ticket_detail', ticket_id=ticket.id) }}">
     <label for="text">Comment</label>
     <textarea id="text" name="text" rows="3" required></textarea>
     <button type="submit">Add comment</button>
