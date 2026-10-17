@@ -44,6 +44,49 @@ file is not grandfathered in:
 Nobody needs to split every oversized file at once. Splitting happens when the
 file is next touched.
 
+## Folders and subfolders
+
+When a split leaves several related files, group them in a folder, and nest
+subfolders (and sub-subfolders) as deep as it takes to keep things organized.
+The same idea works for code and docs:
+
+- **A folder is for a group.** Create one once two or more files belong
+  together. Don't make a folder for a single file.
+- **Each folder has an entry point** that says what is inside: `__init__.py`
+  for a Python package, `README.md` for a docs folder. A partials or CSS folder
+  needs no entry file; its name is enough.
+- **Name folders like files of their type:** `snake_case` for Python and
+  templates, `kebab-case` for CSS, JS, and docs.
+- **Prefer shallow.** Add a level when a folder holds more than about 7–8 files
+  or mixes clearly separate topics, not before.
+- **Moving files is a split too.** It gets its own no-behavior-change commit,
+  and every import, `{% include %}`, `<link>`, `<script>`, and doc link that
+  pointed at the old path must be updated.
+
+Examples:
+
+```
+routes/
+  tickets/                # package once tickets has several route files
+    __init__.py            # creates tickets_bp, imports the route modules
+    views.py
+    comments.py
+templates/partials/
+  tickets/
+    _ticket_row.html
+    _comment.html
+static/css/
+  base.css
+  components/
+    buttons.css
+    forms.css
+docs/guides/
+  database/               # guide that outgrew one file
+    README.md              # overview of the topic, links to each subpage
+    rls-policies.md
+    migrations.md
+```
+
 ## How to split each type
 
 ### Route modules
@@ -98,10 +141,19 @@ page-only scripts from that page's `{% block scripts %}` (add the block to
 
 ### Markdown
 
-`AGENTS.md` stays an overview: one short paragraph or table per topic, plus a
-link to the guide. Detail goes in `docs/guides/<topic>.md`. A guide that covers
-two topics becomes two guides. Update the links in `AGENTS.md` and the list in
-`docs/README.md`.
+The docs form a tree: `AGENTS.md` is the overview, each guide covers one topic,
+and a guide that grows past its limit becomes a folder with sub-guides.
+
+- `AGENTS.md` stays an overview: one short paragraph or table per topic, plus a
+  link to the guide. Detail goes in `docs/guides/<topic>.md`.
+- A guide that covers two topics becomes two guides.
+- A guide that is one topic but too long becomes `docs/guides/<topic>/`, with
+  `README.md` as the overview and one file per subtopic. Subtopics can nest
+  again the same way (`docs/guides/<topic>/<subtopic>/README.md`) when needed.
+- Every level summarizes and links down. Each sub-guide starts with a line
+  linking back up to its parent, so readers (and AI tools) can move in both
+  directions and read only the depth they need.
+- Update the links in `AGENTS.md` and the list in `docs/README.md`.
 
 ## Process
 

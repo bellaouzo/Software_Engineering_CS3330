@@ -68,7 +68,7 @@ supabase/
   seed.sql                 # Seed data (tickets/comments) - profiles come from auth triggers
   config.toml
 docs/                    # Team documents (Word docs, PDFs, spreadsheets)
-  guides/                 # Markdown guides for developers and AI tools (linked above)
+  guides/                 # Markdown guides for developers and AI tools (linked above); may nest into topic folders
 ```
 
 ## Key rules
@@ -121,7 +121,10 @@ jobs. At **must split**, split before adding anything more. Count with `wc -l`.
 Markup used in two or more templates becomes a partial, whatever its size.
 The limits cover existing files too: a file already past "must split" gets
 split the next time someone changes it. Splits go in their own
-no-behavior-change commit. Migrations, `seed.sql`, and
+no-behavior-change commit. Related files from a split can be grouped into
+folders and subfolders (and deeper) as needed, in code (`routes/tickets/`,
+`templates/partials/tickets/`) and in docs (`docs/guides/<topic>/README.md`
+plus sub-guides). Migrations, `seed.sql`, and
 config files are exempt.
 → How to split each type: [file-size-and-splitting.md](docs/guides/file-size-and-splitting.md)
 
@@ -151,6 +154,9 @@ commit of any change, update the affected docs **in the same branch**:
 - Change **this file** only when the summary itself is now wrong, or a folder,
   guide, or file-size limit is added or removed. Keep it under 200 lines. New
   detail goes in a guide, with a one-line pointer here.
+- The docs are a tree: this overview, then one guide per topic, then sub-guides
+  in a topic folder when a guide outgrows one file. Each level summarizes and
+  links down; each sub-guide links back up.
 - New guide: add it to the table at the top and to `docs/README.md`. Manual
   steps on the live Supabase project get a guide too.
 - Markdown goes in `docs/guides/`. Word docs, PDFs, and spreadsheets stay out

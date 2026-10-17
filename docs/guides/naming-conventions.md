@@ -24,7 +24,9 @@ Summary in `AGENTS.md` > Key rules.
 
 - Files: `snake_case.html`, named after the page. `base.html` is the only layout.
 - Partials live in `templates/partials/` and start with an underscore
-  (`_ticket_card.html`, `_flash_messages.html`).
+  (`_ticket_card.html`, `_flash_messages.html`). Group related partials in
+  subfolders when there are several (`templates/partials/tickets/_ticket_row.html`);
+  see `file-size-and-splitting.md` > Folders and subfolders.
 - Template variables: `snake_case`, matching the names passed from Python.
 - Block names: short and lowercase (`title`, `content`, `scripts`).
 
