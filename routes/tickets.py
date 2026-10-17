@@ -47,15 +47,18 @@ def _render_new_ticket(status=200, **form):
 @require_login
 def list_tickets():
     try:
-        tickets = (
+        is_staff = _get_role() == "staff"
+        query = (
             get_user_client()
             .table("tickets")
             .select("*, profiles(name, username)")
             .order("updated_at", desc=True)
-            .execute()
-            .data
         )
-        is_staff = _get_role() == "staff"
+        # RLS should already hide other users' tickets; filter here too so a
+        # misconfigured database can't leak them (F-004).
+        if not is_staff:
+            query = query.eq("created_by", session["user_id"])
+        tickets = query.execute().data
     except AuthError:
         return _expired_login()
     except (PostgrestAPIError, SupabaseException):
@@ -144,7 +147,12 @@ def ticket_detail(ticket_id):
             .maybe_single()
             .execute()
         )
-        if ticket is None or ticket.data is None:
+        is_staff = _get_role() == "staff"
+        if (
+            ticket is None
+            or ticket.data is None
+            or (not is_staff and ticket.data["created_by"] != session["user_id"])
+        ):
             flash("Ticket not found.")
             return redirect(url_for("tickets.list_tickets"))
         comments = (
@@ -155,7 +163,6 @@ def ticket_detail(ticket_id):
             .execute()
             .data
         )
-        is_staff = _get_role() == "staff"
     except AuthError:
         return _expired_login()
     except (PostgrestAPIError, SupabaseException):
