@@ -4,7 +4,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>{% block title %}Facilities desk{% endblock %}</title>
+  <title>{% block title %}Ticketing System{% endblock %}</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
@@ -14,7 +14,7 @@
   {# Header (.topbar): brand link plus main nav. The link matching the current
      route gets aria-current="page", which the CSS styles as the active tab #}
   <header class="topbar">
-    <a class="brand" href="{{ url_for('dashboard.home') }}">Facilities desk</a>
+    <a class="brand" href="{{ url_for('dashboard.home') }}">Ticketing System</a>
     <nav>
       <a href="{{ url_for('dashboard.home') }}" {% if request.endpoint == 'dashboard.home' %}aria-current="page"{% endif %}>Dashboard</a>
       <a href="{{ url_for('tickets.list_tickets') }}" {% if request.endpoint == 'tickets.list_tickets' %}aria-current="page"{% endif %}>Tickets</a>

@@ -145,6 +145,13 @@ it's being tracked deliberately.
   address can't receive mail. After login the Supabase `user_id`, `access_token`,
   and `refresh_token` are stored in the Flask `session`. Any schema change goes
   in a new migration.
+- Registration asks for the password twice (`confirm_password`, checked in
+  `app.js` via `data-match-input` and again in `routes/auth.py`). A failed
+  login or registration re-renders the form with the name/username kept, never
+  the password. `MIN_PASSWORD_LENGTH` in `routes/auth.py` drives the password
+  hint and `minlength`; keep it equal to the Supabase setting.
+- The app's display name is **Ticketing System** (header brand and every page
+  title in `templates/`).
 - **Protecting routes and querying as the user:** put `@require_login` (or
   `@require_staff`) from `auth_helpers.py` under the route decorator. For any
   table query made on a user's behalf, use `get_user_client()` from

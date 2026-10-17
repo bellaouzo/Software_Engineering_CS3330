@@ -17,3 +17,29 @@ document.querySelectorAll("form").forEach((form) => {
     }
   });
 });
+
+/* ==========================================================================
+   Matching Fields
+   An input with data-match-input="<id>" must equal the input with that id
+   (e.g. Confirm password). Uses the browser's built-in validation, so the
+   form won't submit and the browser shows the message on the field.
+   ========================================================================== */
+
+const MISMATCH_MESSAGE = "The passwords don't match.";
+
+document.querySelectorAll("[data-match-input]").forEach((confirmInput) => {
+  const originalInput = document.getElementById(confirmInput.dataset.matchInput);
+  if (!originalInput) {
+    return;
+  }
+
+  const checkMatch = () => {
+    // An empty custom message means "valid"
+    const matches = confirmInput.value === originalInput.value;
+    confirmInput.setCustomValidity(matches ? "" : MISMATCH_MESSAGE);
+  };
+
+  // Re-check when either field changes, so fixing the first one also clears the error
+  confirmInput.addEventListener("input", checkMatch);
+  originalInput.addEventListener("input", checkMatch);
+});
