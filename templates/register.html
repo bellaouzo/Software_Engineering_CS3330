@@ -5,21 +5,22 @@
 {% block content %}
   <h1>Create account</h1>
   {# On a failed submit the route passes back name and username so they stay filled in; passwords never do #}
+  {# data-rule-message is the error app.js shows when a field breaks its minlength/pattern rule #}
   <form class="sheet narrow" method="post" action="{{ url_for('auth.register') }}">
     <label for="name">Name</label>
     <input id="name" name="name" type="text" autocomplete="name" value="{{ name }}" required autofocus>
 
     <label for="username">Username</label>
-    <input id="username" name="username" type="text" autocomplete="username" value="{{ username }}" minlength="3" maxlength="30" pattern="[A-Za-z0-9_]+" aria-describedby="username-hint" required>
+    <input id="username" name="username" type="text" autocomplete="username" value="{{ username }}" minlength="3" maxlength="30" pattern="[A-Za-z0-9_]+" aria-describedby="username-hint" data-rule-message="Usernames are 3 to 30 characters: letters, numbers, and underscores only." required>
     <p class="field-hint" id="username-hint">3 to 30 characters: letters, numbers, and underscores only. Saved in lowercase.</p>
 
     <label for="password">Password</label>
-    <input id="password" name="password" type="password" autocomplete="new-password" minlength="{{ min_password_length }}" aria-describedby="password-hint" required>
+    <input id="password" name="password" type="password" autocomplete="new-password" minlength="{{ min_password_length }}" aria-describedby="password-hint" data-rule-message="Passwords must be at least {{ min_password_length }} characters." required>
     <p class="field-hint" id="password-hint">At least {{ min_password_length }} characters.</p>
 
-    {# data-match-input: app.js blocks submit until this matches #password; the route checks it again #}
+    {# data-match-input: app.js shows an error until this matches #password, the route checks it again #}
     <label for="confirm_password">Confirm password</label>
-    <input id="confirm_password" name="confirm_password" type="password" autocomplete="new-password" data-match-input="password" required>
+    <input id="confirm_password" name="confirm_password" type="password" autocomplete="new-password" data-match-input="password" data-rule-message="The passwords don't match." required>
 
     <button type="submit">Create account</button>
   </form>
