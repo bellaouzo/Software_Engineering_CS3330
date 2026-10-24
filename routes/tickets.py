@@ -121,31 +121,36 @@ def new_ticket():
     return redirect(url_for("tickets.ticket_detail", ticket_id=created.data[0]["id"]))
 
 
+# The POST half of ticket_detail, adds a comment then goes back to the ticket
+def _add_comment(ticket_id):
+    text = request.form.get("text", "").strip()
+    if not text:
+        flash("Write a comment before sending it.", "error")
+    else:
+        try:
+            get_user_client().table("comments").insert(
+                {
+                    "ticket_id": ticket_id,
+                    "user_id": session["user_id"],
+                    "text": text,
+                }
+            ).execute()
+        except AuthError:
+            return _expired_login()
+        except (PostgrestAPIError, SupabaseException):
+            logger.exception("Could not add comment")
+            flash(DB_ERROR, "error")
+        else:
+            flash("Comment added.", "success")
+    return redirect(url_for("tickets.ticket_detail", ticket_id=ticket_id))
+
+
 @tickets_bp.route("/tickets/<ticket_id>", methods=["GET", "POST"])
 @require_login
 def ticket_detail(ticket_id):
     # POST means they're adding a comment, GET just shows the ticket
     if request.method == "POST":
-        text = request.form.get("text", "").strip()
-        if not text:
-            flash("Write a comment before sending it.", "error")
-        else:
-            try:
-                get_user_client().table("comments").insert(
-                    {
-                        "ticket_id": ticket_id,
-                        "user_id": session["user_id"],
-                        "text": text,
-                    }
-                ).execute()
-            except AuthError:
-                return _expired_login()
-            except (PostgrestAPIError, SupabaseException):
-                logger.exception("Could not add comment")
-                flash(DB_ERROR, "error")
-            else:
-                flash("Comment added.", "success")
-        return redirect(url_for("tickets.ticket_detail", ticket_id=ticket_id))
+        return _add_comment(ticket_id)
 
     # Load the ticket, make sure they're allowed to see it, then load its comments
     try:
