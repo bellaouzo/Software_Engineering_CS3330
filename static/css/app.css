@@ -155,6 +155,13 @@ textarea {
   font: inherit;             /* form controls don't inherit fonts by default */
 }
 
+/* Small muted help text under a form field (e.g. allowed characters) */
+.field-hint {
+  margin: 0.3rem 0 0;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
 /* ---------- Buttons ---------- */
 
 /* .button lets links (<a>) look identical to real <button> elements */

@@ -49,6 +49,12 @@ address can't receive mail. After login the Supabase `user_id`, `access_token`,
 and `refresh_token` are stored in the Flask `session`. Live Supabase setup steps
 are in `supabase-live-auth-setup.md`.
 
+Registration asks for the password twice (`confirm_password`, checked in
+`app.js` via `data-match-input` and again in `routes/auth.py`). A failed login
+or registration re-renders the form with the name/username kept, never the
+password. `MIN_PASSWORD_LENGTH` in `routes/auth.py` drives the password hint and
+`minlength`; keep it equal to the Supabase setting.
+
 ## Fixed values
 
 - Ticket status values are exactly: `Submitted`, `Acknowledged`, `In Progress`,
@@ -65,6 +71,8 @@ are in `supabase-live-auth-setup.md`.
   framework or library (Bootstrap, Pico.css, Tailwind, etc.). Our own CSS lives
   in `static/css/app.css`.
 - `base.html` is the only layout; every page extends it.
+- The app's display name is **Ticketing System** (header brand and every page
+  title in `templates/`).
 
 ## Requirement IDs
 

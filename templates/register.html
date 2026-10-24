@@ -1,18 +1,25 @@
 {% extends "base.html" %}
 
-{% block title %}Create account · Facilities desk{% endblock %}
+{% block title %}Create account · Ticketing System{% endblock %}
 
 {% block content %}
   <h1>Create account</h1>
+  {# On a failed submit the route passes back name and username so they stay filled in; passwords never do #}
   <form class="sheet narrow" method="post" action="{{ url_for('auth.register') }}">
     <label for="name">Name</label>
-    <input id="name" name="name" type="text" autocomplete="name" required autofocus>
+    <input id="name" name="name" type="text" autocomplete="name" value="{{ name }}" required autofocus>
 
     <label for="username">Username</label>
-    <input id="username" name="username" type="text" autocomplete="username" minlength="3" maxlength="30" pattern="[A-Za-z0-9_]+" required>
+    <input id="username" name="username" type="text" autocomplete="username" value="{{ username }}" minlength="3" maxlength="30" pattern="[A-Za-z0-9_]+" aria-describedby="username-hint" required>
+    <p class="field-hint" id="username-hint">3 to 30 characters: letters, numbers, and underscores only. Saved in lowercase.</p>
 
     <label for="password">Password</label>
-    <input id="password" name="password" type="password" autocomplete="new-password" required>
+    <input id="password" name="password" type="password" autocomplete="new-password" minlength="{{ min_password_length }}" aria-describedby="password-hint" required>
+    <p class="field-hint" id="password-hint">At least {{ min_password_length }} characters.</p>
+
+    {# data-match-input: app.js blocks submit until this matches #password; the route checks it again #}
+    <label for="confirm_password">Confirm password</label>
+    <input id="confirm_password" name="confirm_password" type="password" autocomplete="new-password" data-match-input="password" required>
 
     <button type="submit">Create account</button>
   </form>

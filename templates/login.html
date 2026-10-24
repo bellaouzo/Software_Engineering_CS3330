@@ -1,12 +1,12 @@
 {% extends "base.html" %}
 
-{% block title %}Log in · Facilities desk{% endblock %}
+{% block title %}Log in · Ticketing System{% endblock %}
 
 {% block content %}
   <h1>Log in</h1>
   <form class="sheet narrow" method="post" action="{{ url_for('auth.login') }}">
     <label for="username">Username</label>
-    <input id="username" name="username" type="text" autocomplete="username" required autofocus>
+    <input id="username" name="username" type="text" autocomplete="username" value="{{ username }}" required autofocus>
 
     <label for="password">Password</label>
     <input id="password" name="password" type="password" autocomplete="current-password" required>

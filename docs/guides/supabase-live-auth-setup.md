@@ -19,7 +19,9 @@ needs the steps below once, before anyone registers on it.
    confirmation link sent to the placeholder address, so nobody can log in.
 3. **Check the password length.** Dashboard > Authentication > Sign In /
    Providers > "Minimum password length". The app shows a "too weak" message when
-   Supabase rejects a password, so any value works. Local uses 6.
+   Supabase rejects a password, so any value works. Local uses 6. The Create
+   account page shows "At least N characters" from `MIN_PASSWORD_LENGTH` in
+   `routes/auth.py`; set it to the live value so the hint is accurate.
 4. **Placeholder email domain.** Hosted Supabase rejects `.invalid` addresses
    (`email_address_invalid`), so the app uses `example.com`. If registration ever
    shows "Something went wrong", check the server log: unmapped Supabase error
