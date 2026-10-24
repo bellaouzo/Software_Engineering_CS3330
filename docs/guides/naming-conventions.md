@@ -64,3 +64,14 @@ Summary in `AGENTS.md` > Key rules.
 
 `feature/<area>-<what>`, named by feature, not by sprint. See
 `git-workflow.md`.
+
+## Form validation
+
+  Each form's rules are plain HTML attributes on
+  the field (`required`, `minlength`, `pattern`), plus `data-rule-message` for
+  the text shown when a `minlength` or `pattern` rule is broken.
+  `static/js/app.js` shows that message in a `.field-error` under the field
+  before the form is sent (it also treats spaces-only as empty), and a
+  `.field-hint` under a field shows its rule up front. The server still checks
+  everything. When the server rejects a form, pass the typed values back to the
+  template as `form` (never the password), as `routes/auth.py` does.
