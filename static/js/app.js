@@ -1,4 +1,6 @@
-Shows a message under a field as soon as its input breaks a rule, and again
+/* ==========================================================================
+   Inline Form Validation (Req 6.1)
+   Shows a message under a field as soon as its input breaks a rule, and again
    for every problem when the user clicks submit, before anything is sent.
    The rules themselves are plain HTML attributes on each field (required,
    minlength, pattern); data-rule-message holds the text shown when a
