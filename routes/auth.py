@@ -6,6 +6,7 @@ from supabase import AuthApiError, AuthError, SupabaseException
 
 from supabase_client import get_supabase_client
 
+# Everything for logging in, signing up, and logging out
 auth_bp = Blueprint("auth", __name__)
 logger = logging.getLogger(__name__)
 
@@ -33,14 +34,17 @@ REGISTER_ERRORS = {
         429,
     ),
 }
+# Fallbacks for errors we didn't plan for or when Supabase is down
 UNKNOWN_ERROR = ("Something went wrong on our end. Try again in a moment.", 502)
 UNREACHABLE_ERROR = ("Could not reach the database. Try again in a moment.", 503)
 
 
+# Turns "zach" into "zach@example.com" for Supabase
 def _username_to_email(username):
     return f"{username}@{PLACEHOLDER_EMAIL_DOMAIN}"
 
 
+# Used after login and when someone already logged in hits /login or /register
 def _redirect_to_dashboard():
     return redirect(url_for("dashboard.home"))
 
@@ -53,11 +57,13 @@ def _lookup_error(errors, error):
     return errors.get(error.code, UNKNOWN_ERROR)
 
 
+# Shows the login page again with the error and keeps the username typed in
 def _login_error(message, status, username=""):
     flash(message)
     return render_template("login.html", username=username), status
 
 
+# Shows the sign up form, also passes the min password length for the hint
 def _render_register(name="", username=""):
     return render_template("register.html", name=name, username=username,
                            min_password_length=MIN_PASSWORD_LENGTH)
@@ -71,11 +77,13 @@ def _register_error(message, status, name="", username=""):
 
 @auth_bp.route("/login", methods=["GET", "POST"])
 def login():
+    # Already logged in, no reason to see the login page
     if "user_id" in session:
         return _redirect_to_dashboard()
     if request.method == "GET":
         return render_template("login.html")
 
+    # Usernames are saved lowercase so lower it here too
     username = request.form.get("username", "").strip().lower()
     password = request.form.get("password", "")
     if not username or not password:
@@ -88,6 +96,7 @@ def login():
         return _login_error(*_lookup_error(LOGIN_ERRORS, error), username)
     except (AuthError, SupabaseException):
         return _login_error(*UNREACHABLE_ERROR, username)
+    # Save who they are and their tokens so get_user_client() can act as them
     session["user_id"] = result.user.id
     session["access_token"] = result.session.access_token
     session["refresh_token"] = result.session.refresh_token
@@ -96,11 +105,13 @@ def login():
 
 @auth_bp.route("/register", methods=["GET", "POST"])
 def register():
+    # Same as login, logged in users skip this page
     if "user_id" in session:
         return _redirect_to_dashboard()
     if request.method == "GET":
         return _render_register()
 
+    # Check the form ourselves first so we can give a clear message
     name = request.form.get("name", "").strip()
     username = request.form.get("username", "").strip().lower()
     password = request.form.get("password", "")
@@ -116,6 +127,7 @@ def register():
     if password != confirm_password:
         return _register_error("The passwords don't match. Type them again.", 400,
                                name, username)
+    # name and username go in metadata, handle_new_user() copies them into profiles
     try:
         get_supabase_client().auth.sign_up(
             {
@@ -134,6 +146,7 @@ def register():
 
 @auth_bp.post("/logout")
 def logout():
+    # Wiping the session logs them out on our side
     session.clear()
     flash("You are logged out.")
     return redirect(url_for("auth.login"))

@@ -6,6 +6,7 @@ from supabase import AuthError, PostgrestAPIError, SupabaseException
 from auth_helpers import require_login, require_staff
 from supabase_client import get_user_client
 
+# All the ticket pages: list, new ticket, detail/comments, and status updates
 tickets_bp = Blueprint("tickets", __name__)
 logger = logging.getLogger(__name__)
 
@@ -13,10 +14,12 @@ logger = logging.getLogger(__name__)
 TICKET_STATUSES = ["Submitted", "Acknowledged", "In Progress", "Resolved", "Closed"]
 TICKET_CATEGORIES = ["Plumbing", "Electrical", "HVAC", "Furniture", "Cleaning", "Other"]
 
+# Messages we flash when something goes wrong
 DB_ERROR = "Could not reach the database. Try again in a moment."
 LOGIN_EXPIRED = "Your login expired. Log in again."
 
 
+# Their token died, so clear everything and send them back to login
 def _expired_login():
     session.clear()
     flash(LOGIN_EXPIRED)
@@ -36,6 +39,7 @@ def _get_role():
     return profile.data["role"]
 
 
+# Shows the new ticket form, refilled with whatever they typed if it failed
 def _render_new_ticket(status=200, **form):
     return (
         render_template("new_ticket.html", categories=TICKET_CATEGORIES, form=form),
@@ -46,6 +50,7 @@ def _render_new_ticket(status=200, **form):
 @tickets_bp.get("/tickets")
 @require_login
 def list_tickets():
+    # Staff see every ticket, requesters only see their own
     try:
         is_staff = _get_role() == "staff"
         query = (
@@ -75,6 +80,7 @@ def new_ticket():
     if request.method == "GET":
         return _render_new_ticket()
 
+    # Grab what they typed, title is the only required field
     form = {
         "title": request.form.get("title", "").strip(),
         "description": request.form.get("description", "").strip(),
@@ -84,6 +90,7 @@ def new_ticket():
     if not form["title"]:
         flash("Add a title before submitting the ticket.")
         return _render_new_ticket(400, **form)
+    # Someone could send a made up category, just blank it out
     if form["category"] not in TICKET_CATEGORIES:
         form["category"] = ""
 
@@ -109,6 +116,7 @@ def new_ticket():
         logger.exception("Could not create ticket")
         flash(DB_ERROR)
         return _render_new_ticket(503, **form)
+    # Send them straight to the ticket they just made
     flash("Ticket submitted.")
     return redirect(url_for("tickets.ticket_detail", ticket_id=created.data[0]["id"]))
 
@@ -116,6 +124,7 @@ def new_ticket():
 @tickets_bp.route("/tickets/<ticket_id>", methods=["GET", "POST"])
 @require_login
 def ticket_detail(ticket_id):
+    # POST means they're adding a comment, GET just shows the ticket
     if request.method == "POST":
         text = request.form.get("text", "").strip()
         if not text:
@@ -138,6 +147,7 @@ def ticket_detail(ticket_id):
                 flash("Comment added.")
         return redirect(url_for("tickets.ticket_detail", ticket_id=ticket_id))
 
+    # Load the ticket, make sure they're allowed to see it, then load its comments
     try:
         client = get_user_client()
         ticket = (
@@ -182,6 +192,7 @@ def ticket_detail(ticket_id):
 @tickets_bp.post("/tickets/<ticket_id>/status")
 @require_staff
 def update_ticket_status(ticket_id):
+    # Staff only (Req 2.3.1). Only accept one of the real status values
     status = request.form.get("status", "")
     if status not in TICKET_STATUSES:
         flash("Pick a valid status.")

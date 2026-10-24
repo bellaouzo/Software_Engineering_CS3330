@@ -4,6 +4,7 @@
 
 {% block content %}
   <h1>New ticket</h1>
+  {# form.* is whatever they typed before, so nothing gets lost if it fails #}
   <form class="sheet" method="post" action="{{ url_for('tickets.new_ticket') }}">
     <label for="title">Title</label>
     <input id="title" name="title" type="text" required autofocus value="{{ form.title or '' }}">
@@ -15,6 +16,7 @@
     <input id="location" name="location" type="text" value="{{ form.location or '' }}">
 
     <label for="category">Category</label>
+    {# Categories come from TICKET_CATEGORIES in routes/tickets.py #}
     <select id="category" name="category">
       <option value="">Choose a category</option>
       {% for category in categories %}

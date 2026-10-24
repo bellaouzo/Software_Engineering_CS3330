@@ -3,10 +3,18 @@
 {% block title %}Dashboard · Ticketing System{% endblock %}
 
 {% block content %}
-  <h1>Maintenance tickets</h1>
-  <p class="lede">Report a problem and follow what happens next.</p>
-  <div class="actions">
-    <a class="button" href="{{ url_for('tickets.new_ticket') }}">New ticket</a>
-    <a class="button button-quiet" href="{{ url_for('tickets.list_tickets') }}">View tickets</a>
-  </div>
+  {% if not profile %}
+    {# Logged out (or the database didn't load), so show the plain welcome page #}
+    <h1>Maintenance tickets</h1>
+    <p class="lede">Report a problem and follow what happens next.</p>
+    <div class="actions">
+      <a class="button" href="{{ url_for('tickets.new_ticket') }}">New ticket</a>
+      <a class="button button-quiet" href="{{ url_for('tickets.list_tickets') }}">View tickets</a>
+    </div>
+  {% elif is_staff %}
+    {# Each role's dashboard is its own partial so this file stays small #}
+    {% include "partials/dashboard/_staff.html" %}
+  {% else %}
+    {% include "partials/dashboard/_requester.html" %}
+  {% endif %}
 {% endblock %}

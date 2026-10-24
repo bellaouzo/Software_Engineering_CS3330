@@ -1,0 +1,41 @@
+{# Staff view: counts for every status plus the tickets nobody has looked at yet (Req 2.2.2) #}
+<h1>Staff dashboard</h1>
+<p class="lede">Hi {{ profile.name or profile.username }}. Here's every ticket by status.</p>
+
+<ul class="stat-grid">
+  {% for status, count in counts.items() %}
+    {# Submitted gets an orange edge when there's something waiting #}
+    <li class="stat-tile{% if status == 'Submitted' and count %} stat-tile--alert{% endif %}">
+      <span class="stat-tile__count">{{ count }}</span>
+      <span class="stat-tile__label">{{ status }}</span>
+    </li>
+  {% endfor %}
+</ul>
+
+<h2>New tickets</h2>
+<p class="lede">Submitted and not acknowledged yet.</p>
+{% if new_tickets %}
+  <ul class="ticket-list">
+    {% with show_owner=true %}
+      {% for ticket in new_tickets %}{% include "partials/_ticket_row.html" %}{% endfor %}
+    {% endwith %}
+  </ul>
+{% else %}
+  <div class="sheet"><p>No new tickets right now.</p></div>
+{% endif %}
+
+{# Last few tickets that changed, so staff can see what's been happening #}
+<h2>Recently updated</h2>
+{% if recent_tickets %}
+  <ul class="ticket-list">
+    {% with show_owner=true, show_updated=true %}
+      {% for ticket in recent_tickets %}{% include "partials/_ticket_row.html" %}{% endfor %}
+    {% endwith %}
+  </ul>
+{% else %}
+  <div class="sheet"><p>No tickets yet.</p></div>
+{% endif %}
+
+<div class="actions">
+  <a class="button" href="{{ url_for('tickets.list_tickets') }}">View all {{ total_count }} tickets</a>
+</div>

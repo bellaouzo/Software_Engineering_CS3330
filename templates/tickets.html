@@ -7,19 +7,10 @@
   <p class="lede">{% if is_staff %}Every ticket, newest activity first.{% else %}The tickets you have opened.{% endif %}</p>
   {% if tickets %}
     <ul class="ticket-list">
-      {% for ticket in tickets %}
-        <li>
-          <div>
-            <a href="{{ url_for('tickets.ticket_detail', ticket_id=ticket.id) }}">{{ ticket.title }}</a>
-            <div class="ticket-meta">
-              {% if ticket.category %}{{ ticket.category }}{% endif %}
-              {% if ticket.location %}· {{ ticket.location }}{% endif %}
-              {% if is_staff and ticket.profiles %}· {{ ticket.profiles.name or ticket.profiles.username }}{% endif %}
-            </div>
-          </div>
-          <span class="status-badge">{{ ticket.status }}</span>
-        </li>
-      {% endfor %}
+      {# Same row as the dashboard. Staff also see who opened each ticket #}
+      {% with show_owner=is_staff %}
+        {% for ticket in tickets %}{% include "partials/_ticket_row.html" %}{% endfor %}
+      {% endwith %}
     </ul>
   {% else %}
     <div class="sheet">
