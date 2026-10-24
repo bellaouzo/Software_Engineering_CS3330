@@ -22,7 +22,7 @@ LOGIN_EXPIRED = "Your login expired. Log in again."
 # Their token died, so clear everything and send them back to login
 def _expired_login():
     session.clear()
-    flash(LOGIN_EXPIRED)
+    flash(LOGIN_EXPIRED, "error")
     return redirect(url_for("auth.login"))
 
 
@@ -68,7 +68,7 @@ def list_tickets():
         return _expired_login()
     except (PostgrestAPIError, SupabaseException):
         logger.exception("Could not load tickets")
-        flash(DB_ERROR)
+        flash(DB_ERROR, "error")
         tickets = []
         is_staff = False
     return render_template("tickets.html", tickets=tickets, is_staff=is_staff)
@@ -88,7 +88,7 @@ def new_ticket():
         "category": request.form.get("category", ""),
     }
     if not form["title"]:
-        flash("Add a title before submitting the ticket.")
+        flash("Add a title before submitting the ticket.", "error")
         return _render_new_ticket(400, **form)
     # Someone could send a made up category, just blank it out
     if form["category"] not in TICKET_CATEGORIES:
@@ -114,11 +114,35 @@ def new_ticket():
         return _expired_login()
     except (PostgrestAPIError, SupabaseException):
         logger.exception("Could not create ticket")
-        flash(DB_ERROR)
+        flash(DB_ERROR, "error")
         return _render_new_ticket(503, **form)
     # Send them straight to the ticket they just made
-    flash("Ticket submitted.")
+    flash("Ticket submitted.", "success")
     return redirect(url_for("tickets.ticket_detail", ticket_id=created.data[0]["id"]))
+
+
+# The POST half of ticket_detail, adds a comment then goes back to the ticket
+def _add_comment(ticket_id):
+    text = request.form.get("text", "").strip()
+    if not text:
+        flash("Write a comment before sending it.", "error")
+    else:
+        try:
+            get_user_client().table("comments").insert(
+                {
+                    "ticket_id": ticket_id,
+                    "user_id": session["user_id"],
+                    "text": text,
+                }
+            ).execute()
+        except AuthError:
+            return _expired_login()
+        except (PostgrestAPIError, SupabaseException):
+            logger.exception("Could not add comment")
+            flash(DB_ERROR, "error")
+        else:
+            flash("Comment added.", "success")
+    return redirect(url_for("tickets.ticket_detail", ticket_id=ticket_id))
 
 
 @tickets_bp.route("/tickets/<ticket_id>", methods=["GET", "POST"])
@@ -126,26 +150,7 @@ def new_ticket():
 def ticket_detail(ticket_id):
     # POST means they're adding a comment, GET just shows the ticket
     if request.method == "POST":
-        text = request.form.get("text", "").strip()
-        if not text:
-            flash("Write a comment before sending it.")
-        else:
-            try:
-                get_user_client().table("comments").insert(
-                    {
-                        "ticket_id": ticket_id,
-                        "user_id": session["user_id"],
-                        "text": text,
-                    }
-                ).execute()
-            except AuthError:
-                return _expired_login()
-            except (PostgrestAPIError, SupabaseException):
-                logger.exception("Could not add comment")
-                flash(DB_ERROR)
-            else:
-                flash("Comment added.")
-        return redirect(url_for("tickets.ticket_detail", ticket_id=ticket_id))
+        return _add_comment(ticket_id)
 
     # Load the ticket, make sure they're allowed to see it, then load its comments
     try:
@@ -163,11 +168,12 @@ def ticket_detail(ticket_id):
             or ticket.data is None
             or (not is_staff and ticket.data["created_by"] != session["user_id"])
         ):
-            flash("Ticket not found.")
+            flash("Ticket not found.", "error")
             return redirect(url_for("tickets.list_tickets"))
+        # role lets the template mark staff replies (any logged-in user can read profiles)
         comments = (
             client.table("comments")
-            .select("*, profiles(name, username)")
+            .select("*, profiles(name, username, role)")
             .eq("ticket_id", ticket_id)
             .order("timestamp")
             .execute()
@@ -178,7 +184,7 @@ def ticket_detail(ticket_id):
     except (PostgrestAPIError, SupabaseException):
         # A malformed id (not a UUID) also lands here.
         logger.exception("Could not load ticket %s", ticket_id)
-        flash("Ticket not found.")
+        flash("Ticket not found.", "error")
         return redirect(url_for("tickets.list_tickets"))
     return render_template(
         "ticket_detail.html",
@@ -195,7 +201,7 @@ def update_ticket_status(ticket_id):
     # Staff only (Req 2.3.1). Only accept one of the real status values
     status = request.form.get("status", "")
     if status not in TICKET_STATUSES:
-        flash("Pick a valid status.")
+        flash("Pick a valid status.", "error")
     else:
         try:
             get_user_client().table("tickets").update({"status": status}).eq(
@@ -205,7 +211,7 @@ def update_ticket_status(ticket_id):
             return _expired_login()
         except (PostgrestAPIError, SupabaseException):
             logger.exception("Could not update status for ticket %s", ticket_id)
-            flash(DB_ERROR)
+            flash(DB_ERROR, "error")
         else:
-            flash(f"Status changed to {status}.")
+            flash(f"Status changed to {status}.", "success")
     return redirect(url_for("tickets.ticket_detail", ticket_id=ticket_id))

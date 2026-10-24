@@ -20,6 +20,11 @@ data) in one function, per Flask convention — don't split these into two route
 - All ticket routes are wired to Supabase. Database errors are caught
   (`PostgrestAPIError`, `SupabaseException`, `AuthError`) and shown as a plain
   flash message; an expired login clears the session and goes to `/login`.
+- Every `flash()` passes a category: `"success"` for things that worked
+  ("Ticket submitted.") and `"error"` for anything that failed or was blocked.
+  Templates read them with `get_flashed_messages(with_categories=true)`.
+- The comments query on the ticket page joins `profiles(name, username, role)`,
+  so a template can tell staff replies apart (`comment.profiles.role`).
 - **Protecting routes and querying as the user:** put `@require_login` (or
   `@require_staff`) from `auth_helpers.py` under the route decorator. For any
   table query made on a user's behalf, use `get_user_client()` from
