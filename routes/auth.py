@@ -59,7 +59,7 @@ def _lookup_error(errors, error):
 
 # Shows the login page again with the error and keeps the username typed in
 def _login_error(message, status, username=""):
-    flash(message)
+    flash(message, "error")
     return render_template("login.html", username=username), status
 
 
@@ -71,7 +71,7 @@ def _render_register(name="", username=""):
 
 def _register_error(message, status, name="", username=""):
     """Re-shows the form with the name and username kept (never the password)."""
-    flash(message)
+    flash(message, "error")
     return _render_register(name, username), status
 
 
@@ -140,7 +140,7 @@ def register():
         return _register_error(*_lookup_error(REGISTER_ERRORS, error), name, username)
     except (AuthError, SupabaseException):
         return _register_error(*UNREACHABLE_ERROR, name, username)
-    flash("Account created. Log in with your new username.")
+    flash("Account created. Log in with your new username.", "success")
     return redirect(url_for("auth.login"))
 
 
@@ -148,5 +148,5 @@ def register():
 def logout():
     # Wiping the session logs them out on our side
     session.clear()
-    flash("You are logged out.")
+    flash("You are logged out.", "success")
     return redirect(url_for("auth.login"))

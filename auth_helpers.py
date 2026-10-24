@@ -16,7 +16,7 @@ def require_login(view):
     @wraps(view)
     def wrapped_view(*args, **kwargs):
         if "user_id" not in session:
-            flash("Log in to continue.")
+            flash("Log in to continue.", "error")
             return redirect(url_for("auth.login"))
         return view(*args, **kwargs)
 
@@ -43,11 +43,11 @@ def require_staff(view):
             )
         except (AuthError, SupabaseException):
             session.clear()
-            flash("Your login expired. Log in again.")
+            flash("Your login expired. Log in again.", "error")
             return redirect(url_for("auth.login"))
         # Logged in but not staff, send them home
         if profile.data["role"] != "staff":
-            flash("Only staff can open that page.")
+            flash("Only staff can open that page.", "error")
             return redirect(url_for("dashboard.home"))
         return view(*args, **kwargs)
 

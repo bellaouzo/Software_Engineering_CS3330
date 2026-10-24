@@ -61,11 +61,11 @@ def home():
         profile, is_staff, tickets = _load_dashboard()
     except AuthError:
         session.clear()
-        flash(LOGIN_EXPIRED)
+        flash(LOGIN_EXPIRED, "error")
         return redirect(url_for("auth.login"))
     except (PostgrestAPIError, SupabaseException):
         logger.exception("Could not load dashboard")
-        flash(DB_ERROR)
+        flash(DB_ERROR, "error")
         return render_template("dashboard.html", profile=None)
 
     # Tickets are already newest first, so slicing gives the most recent ones
