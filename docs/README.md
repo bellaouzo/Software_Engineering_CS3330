@@ -14,9 +14,17 @@ and notes about how the code works. They live in `guides/` so they diff cleanly
 in Git and AI agents can read them. Word docs, PDFs, and spreadsheets are for
 the class deliverables and stay out of `guides/`.
 
-- `guides/` - Markdown guides: `supabase-live-auth-setup.md` (live Supabase
-  steps for login) and `auth-helpers-examples.md` (how routes use the login and
-  database helpers)
+- `guides/` - Markdown guides. `AGENTS.md` at the repo root is the overview
+  and links to each one:
+  - `setup-and-running.md` - running the app, `dev.py`, `.env`, Git/`gh` setup
+  - `conventions.md` - routes, templates, Supabase queries, login, fixed values
+  - `naming-conventions.md` - names for files, functions, URLs, CSS, tables
+  - `database-schema.md` - tables, triggers, RLS, known issue, migrations
+  - `file-size-and-splitting.md` - line limits per file type and how to split
+  - `git-workflow.md` - branches, PRs, and the merge steps
+  - `testing.md` - cross-functional testing and Test Plans
+  - `auth-helpers-examples.md` - how routes use the login and database helpers
+  - `supabase-live-auth-setup.md` - live Supabase steps for login
 
 ## Suggested layout
 
