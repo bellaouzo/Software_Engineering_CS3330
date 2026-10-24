@@ -55,6 +55,17 @@ or registration re-renders the form with the name/username kept, never the
 password. `MIN_PASSWORD_LENGTH` in `routes/auth.py` drives the password hint and
 `minlength`; keep it equal to the Supabase setting.
 
+## Form validation (Req 6.1)
+
+Each form's rules are plain HTML attributes on the field (`required`,
+`minlength`, `pattern`, `data-match-input`), plus `data-rule-message` for the
+text shown when one of those rules is broken. `static/js/app.js` shows that
+message in a `.field-error` under the field before the form is sent (it also
+treats spaces-only as empty), and a `.field-hint` under a field shows its rule
+up front. The server still checks everything. When the server rejects a form,
+pass the typed values back to the template (never the password), like
+`routes/auth.py` and `routes/tickets.py` do.
+
 ## Fixed values
 
 - Ticket status values are exactly: `Submitted`, `Acknowledged`, `In Progress`,

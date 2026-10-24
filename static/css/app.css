@@ -15,7 +15,7 @@
   --stamp: #c4512c;      /* accent: buttons and active-nav underline */
   --stamp-ink: #fff8f4;  /* text color on top of the accent */
   --focus: #1f6f8b;      /* links and keyboard focus ring */
-   --error: #a3261b;     /* inline form errors (Req 6.1) */
+  --error: #a3261b;      /* inline form errors (Req 6.1) */
 }
 
 /* ---------- Base / reset ---------- */
@@ -307,24 +307,18 @@ button,
   }
 }
 
-/* ---------- Form hints and inline errors (Req 6.1) ---------- */
- 
-/* Rule shown under a field before the user types (e.g. username rules) */
-.field-hint {
-  margin: 0.3rem 0 0;
-  color: var(--muted);
-  font-size: 0.9rem;
-}
- 
-/* Message shown under a field when its input breaks a rule (added by app.js) */
+/* ---------- Inline form errors (Req 6.1) ---------- */
+/* .field-hint is up in the forms section, these are the error versions */
+
+/* Red message under a field that broke a rule, app.js adds these */
 .field-error {
   margin: 0.3rem 0 0;
   color: var(--error);
   font-size: 0.9rem;
   font-weight: 500;
 }
- 
-/* Red border on the field that has the problem */
+
+/* Red border on the field with the problem */
 input.has-error,
 textarea.has-error,
 select.has-error {

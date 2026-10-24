@@ -1,23 +1,24 @@
 /* ==========================================================================
    Inline Form Validation (Req 6.1)
-   Shows a message under a field as soon as its input breaks a rule, and again
-   for every problem when the user clicks submit, before anything is sent.
-   The rules themselves are plain HTML attributes on each field (required,
-   minlength, pattern); data-rule-message holds the text shown when a
-   minlength or pattern rule is broken. The server still checks everything.
+   Shows an error under a field once it breaks a rule, and shows all of them
+   when you hit submit so nothing bad gets sent. The rules are just HTML
+   attributes on the field (required, minlength, pattern, data-match-input).
+   data-rule-message is the error text. The server still checks everything.
    ========================================================================== */
- 
+
 const FIELD_SELECTOR = "input, textarea, select";
- 
-// The text of the field's <label>, e.g. "Title"
+// Used if a match field doesn't have its own data-rule-message
+const MISMATCH_MESSAGE = "The passwords don't match.";
+
+// Gets the field's label text (like "Title") for the error message
 function getFieldLabel(field) {
   const label = field.form.querySelector(`label[for="${field.id}"]`);
   return label ? label.textContent.trim() : "This field";
 }
- 
-// Two checks the browser does not do reliably on its own:
-// - a required field holding only spaces counts as empty (the server agrees)
-// - minlength, which browsers skip for values filled in by autofill or scripts
+
+// Checks the browser doesn't do well on its own:
+// spaces only counts as empty (the server strips them too), minlength
+// (browsers skip it for autofilled values), and confirm password matching
 function checkExtraRules(field) {
   const value = field.value;
   const isText = field.tagName === "TEXTAREA" || field.type === "text";
@@ -26,11 +27,17 @@ function checkExtraRules(field) {
     message = `${getFieldLabel(field)} is required.`;
   } else if (field.minLength > 0 && value !== "" && value.length < field.minLength) {
     message = field.dataset.ruleMessage || `${getFieldLabel(field)} is too short.`;
+  } else if (field.dataset.matchInput) {
+    const original = document.getElementById(field.dataset.matchInput);
+    if (original && value !== "" && value !== original.value) {
+      message = field.dataset.ruleMessage || MISMATCH_MESSAGE;
+    }
   }
+  // An empty message means the field is fine
   field.setCustomValidity(message);
 }
- 
-// The message for the first rule this field breaks, or "" if it is fine
+
+// Returns the error for the first rule the field breaks, or "" if it's fine
 function getErrorMessage(field) {
   const validity = field.validity;
   if (validity.valueMissing) {
@@ -44,8 +51,8 @@ function getErrorMessage(field) {
   }
   return "";
 }
- 
-// The message element under a field, created the first time it is needed
+
+// Finds the error <p> under a field, or makes one the first time
 function getErrorElement(field) {
   const errorId = `${field.id}-error`;
   let error = document.getElementById(errorId);
@@ -54,28 +61,29 @@ function getErrorElement(field) {
     error.id = errorId;
     error.className = "field-error";
     error.hidden = true;
- 
-    // Put it after the field's hint text if there is one, otherwise after the field
+
+    // Goes under the hint text if the field has one, otherwise right under the field
     const hint = field.nextElementSibling;
     const anchor = hint && hint.classList.contains("field-hint") ? hint : field;
     anchor.insertAdjacentElement("afterend", error);
- 
-    // Screen readers read the hint and the error together with the field
+
+    // Lets screen readers read the error along with the field
     const describedBy = field.getAttribute("aria-describedby");
     field.setAttribute("aria-describedby", describedBy ? `${describedBy} ${errorId}` : errorId);
   }
   return error;
 }
- 
-// Checks one field and shows or hides its message. Returns true if it is valid.
+
+// Checks one field and shows or hides its error. Returns true if it's valid.
 function validateField(field) {
   if (!field.id || !field.willValidate) {
     return true;
   }
   checkExtraRules(field);
   const message = getErrorMessage(field);
+  // Fine and never had an error, so there's nothing to update
   if (!message && !document.getElementById(`${field.id}-error`)) {
-    return true; // valid and never showed an error: nothing to update
+    return true;
   }
   const error = getErrorElement(field);
   error.textContent = message;
@@ -84,13 +92,13 @@ function validateField(field) {
   field.setAttribute("aria-invalid", message ? "true" : "false");
   return !message;
 }
- 
+
 document.querySelectorAll("form").forEach((form) => {
-  // Our messages replace the browser's pop-up bubbles. Without JavaScript,
-  // noValidate stays false and the browser's own checks still run.
+  // Turn off the browser's popup bubbles since we show our own errors.
+  // If JavaScript is off this never runs, so the browser checks still work.
   form.noValidate = true;
- 
-  // Leaving a field the user typed in: check it right away
+
+  // When they click out of a field they typed in, check it
   form.addEventListener("focusout", (event) => {
     const field = event.target;
     if (field.matches(FIELD_SELECTOR) && field.value !== "") {
@@ -98,18 +106,24 @@ document.querySelectorAll("form").forEach((form) => {
       validateField(field);
     }
   });
- 
-  // Typing in a field that was already checked: update its message live,
-  // so it disappears as soon as the input is fixed
+
+  // Once a field has been checked, re-check it as they type so the error
+  // goes away as soon as it's fixed
   form.addEventListener("input", (event) => {
     const field = event.target;
     if (field.dataset.touched) {
       validateField(field);
     }
+    // Changing the password also re-checks Confirm password
+    form.querySelectorAll(`[data-match-input="${field.id}"]`).forEach((confirmField) => {
+      if (confirmField.dataset.touched) {
+        validateField(confirmField);
+      }
+    });
   });
- 
+
   form.addEventListener("submit", (event) => {
-    // Check every field, so all problems show at once
+    // Check every field so all the errors show at once
     let firstInvalid = null;
     form.querySelectorAll(FIELD_SELECTOR).forEach((field) => {
       field.dataset.touched = "true";
@@ -117,17 +131,17 @@ document.querySelectorAll("form").forEach((form) => {
         firstInvalid = field;
       }
     });
- 
+
+    // Something's wrong, so stop the submit and jump to the first bad field
     if (firstInvalid) {
-      event.preventDefault(); // nothing is sent
+      event.preventDefault();
       firstInvalid.focus();
       return;
     }
- 
-    /* Form Submit Guard: disable the submit button once a valid form is sent,
-       to prevent accidental double submissions (e.g. duplicate tickets or
-       comments). Disabling happens after the submit event fires, so the form
-       still submits normally; it just can't be clicked a second time. */
+
+    // Submit guard: disable the button after a good submit so people can't
+    // double click and make duplicate tickets or comments. The form still
+    // sends since this runs after the submit already started.
     const button = form.querySelector("button[type='submit']");
     if (button) {
       button.disabled = true;
