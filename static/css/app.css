@@ -24,6 +24,7 @@
   box-sizing: border-box;
 }
 
+/* Page background, text color, and font for everything */
 body {
   margin: 0;
   background: var(--paper);
@@ -33,6 +34,7 @@ body {
   line-height: 1.45;
 }
 
+/* Links use the blue focus color */
 a {
   color: var(--focus);
 }
@@ -55,12 +57,14 @@ a {
   text-decoration: none;
 }
 
+/* Nav links sit in a row */
 nav {
   display: flex;
   flex-wrap: wrap;           /* let links wrap on narrow screens */
   gap: 0.35rem 1rem;         /* row gap, column gap */
 }
 
+/* Light text so the links show up on the dark bar */
 nav a {
   color: #d5e0e6;
   text-decoration: none;
@@ -71,6 +75,7 @@ nav a {
   margin: 0;
 }
 
+/* Strip the button look so Log out matches the other links */
 .nav-logout button {
   margin: 0;
   padding: 0;
@@ -100,6 +105,7 @@ main {
   padding: 2rem 0 4rem;
 }
 
+/* Page titles */
 h1 {
   margin: 0 0 0.4rem;
   font-size: 2rem;
@@ -143,6 +149,7 @@ label {
   font-weight: 500;
 }
 
+/* Full width boxes for every form field */
 input,
 select,
 textarea {
@@ -228,11 +235,13 @@ button,
   border-top: 0;
 }
 
+/* Small gray line under a ticket title (category, location, etc.) */
 .ticket-meta {
   color: var(--muted);
   font-size: 0.9rem;
 }
 
+/* Little box with the ticket status */
 .status-badge {
   align-self: flex-start;
   padding: 0.1rem 0.5rem;
@@ -242,6 +251,9 @@ button,
   white-space: nowrap;
 }
 
+/* ---------- Ticket detail ---------- */
+
+/* Two columns: field name on the left, value on the right */
 .ticket-fields {
   display: grid;
   grid-template-columns: max-content 1fr;
@@ -257,11 +269,15 @@ button,
   margin: 0;
 }
 
+/* Keep the line breaks people typed in the description */
 .ticket-description {
   margin: 0;
   white-space: pre-wrap;
 }
 
+/* ---------- Comments ---------- */
+
+/* Comment list uses the same card look as the ticket list */
 .comment-list {
   margin: 0;
   padding: 0;
@@ -270,6 +286,7 @@ button,
   border: 1px solid var(--line);
 }
 
+/* Divider between comments */
 .comment-list li {
   padding: 0.8rem 1rem;
   border-top: 1px solid var(--line);
@@ -284,8 +301,47 @@ button,
   white-space: pre-wrap;
 }
 
+/* A bit of space between the comments and the form */
 .comment-form {
   margin-top: 1rem;
+}
+
+/* ---------- Dashboard ---------- */
+
+/* Row of count boxes, fits as many per row as the screen allows */
+.stat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(8.5rem, 1fr));
+  gap: 0.75rem;
+  margin: 1.25rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* One count box, same card look as .sheet */
+.stat-tile {
+  padding: 0.9rem 1rem;
+  background: var(--sheet);
+  border: 1px solid var(--line);
+}
+
+/* The big number */
+.stat-tile__count {
+  display: block;
+  font-size: 2rem;
+  font-weight: 600;
+  line-height: 1.1;
+}
+
+/* What the number is counting */
+.stat-tile__label {
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+/* Orange edge on the staff Submitted box when tickets are waiting */
+.stat-tile--alert {
+  border-left: 4px solid var(--stamp);
 }
 
 /* ---------- Accessibility ---------- */

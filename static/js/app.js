@@ -25,10 +25,12 @@ document.querySelectorAll("form").forEach((form) => {
    form won't submit and the browser shows the message on the field.
    ========================================================================== */
 
+// Message the browser shows on the confirm field
 const MISMATCH_MESSAGE = "The passwords don't match.";
 
 document.querySelectorAll("[data-match-input]").forEach((confirmInput) => {
   const originalInput = document.getElementById(confirmInput.dataset.matchInput);
+  // Skip it if the id doesn't point at a real input
   if (!originalInput) {
     return;
   }

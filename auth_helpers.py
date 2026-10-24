@@ -12,6 +12,7 @@ def require_login(view):
     Put it under the route decorator: @tickets_bp.get("/tickets") then @require_login.
     """
 
+    # wraps keeps the route's name so url_for still works
     @wraps(view)
     def wrapped_view(*args, **kwargs):
         if "user_id" not in session:
@@ -44,6 +45,7 @@ def require_staff(view):
             session.clear()
             flash("Your login expired. Log in again.")
             return redirect(url_for("auth.login"))
+        # Logged in but not staff, send them home
         if profile.data["role"] != "staff":
             flash("Only staff can open that page.")
             return redirect(url_for("dashboard.home"))

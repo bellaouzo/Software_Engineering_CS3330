@@ -1,0 +1,14 @@
+{# One row in a .ticket-list. Used by tickets.html and dashboard.html.
+   Set show_owner / show_updated with {% with %} to add who opened it or when it was last updated #}
+<li>
+  <div>
+    <a href="{{ url_for('tickets.ticket_detail', ticket_id=ticket.id) }}">{{ ticket.title }}</a>
+    <div class="ticket-meta">
+      {% if ticket.category %}{{ ticket.category }}{% endif %}
+      {% if ticket.location %}· {{ ticket.location }}{% endif %}
+      {% if show_owner and ticket.profiles %}· {{ ticket.profiles.name or ticket.profiles.username }}{% endif %}
+      {% if show_updated %}· Updated {{ ticket.updated_at[:16].replace('T', ' ') }} UTC{% endif %}
+    </div>
+  </div>
+  <span class="status-badge">{{ ticket.status }}</span>
+</li>

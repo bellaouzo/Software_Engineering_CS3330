@@ -30,6 +30,7 @@
     </nav>
   </header>
   <main>
+    {# Flash messages from the routes (errors, "Ticket submitted.", etc.) #}
     {% with messages = get_flashed_messages() %}
       {% if messages %}
         <div class="flash" role="status">
@@ -39,8 +40,10 @@
         </div>
       {% endif %}
     {% endwith %}
+    {# Each page puts its stuff here #}
     {% block content %}{% endblock %}
   </main>
+  {# Loaded last so the page is there before the script runs #}
   <script src="{{ url_for('static', filename='js/app.js') }}"></script>
 </body>
 </html>

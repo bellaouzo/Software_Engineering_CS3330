@@ -44,11 +44,11 @@ if os.name == "nt":
 _COLOR = sys.stdout.isatty() and "NO_COLOR" not in os.environ
 
 
-def _c(code, text):
+def _c(code, text):  # wraps text in a color code, plain text if colors are off
     return f"\033[{code}m{text}\033[0m" if _COLOR else text
 
 
-def bold(t): return _c("1", t)
+def bold(t): return _c("1", t)  # little color helpers for the terminal output
 def dim(t): return _c("2", t)
 def green(t): return _c("32", t)
 def yellow(t): return _c("33", t)
@@ -56,18 +56,18 @@ def red(t): return _c("31", t)
 def cyan(t): return _c("36", t)
 
 
-def header(text):
+def header(text):  # section title like == Docker ==
     print()
     print(cyan(bold(f"== {text} ==")))
 
 
-def info(text): print(f"  {text}")
+def info(text): print(f"  {text}")  # print helpers for normal / ok / warning / error lines
 def ok(text): print(f"  {green('OK')} {text}")
 def warn(text): print(f"  {yellow('!')} {text}")
 def fail(text): print(f"  {red('X')} {text}")
 
 
-def ask(prompt, default=None):
+def ask(prompt, default=None):  # asks a question, Enter takes the default
     suffix = f" [{default}]" if default else ""
     try:
         answer = input(f"{bold(prompt)}{suffix}: ").strip()
@@ -76,7 +76,7 @@ def ask(prompt, default=None):
     return answer or (default or "")
 
 
-def ask_yes_no(prompt, default=True):
+def ask_yes_no(prompt, default=True):  # keeps asking until they type y or n (or hit Enter)
     hint = "Y/n" if default else "y/N"
     while True:
         answer = ask(f"{prompt} ({hint})").lower()
@@ -100,11 +100,11 @@ def ask_choice(prompt, options, default=1):
         warn(f"Please enter a number from 1 to {len(options)}.")
 
 
-def run(cmd, env=None, check=False):
+def run(cmd, env=None, check=False):  # runs a command from the repo folder
     return subprocess.run(cmd, cwd=ROOT, env=env, check=check)
 
 
-def capture(cmd, env=None):
+def capture(cmd, env=None):  # same thing but grabs the output instead of printing it
     return subprocess.run(
         cmd, cwd=ROOT, env=env, capture_output=True, text=True, encoding="utf-8", errors="replace"
     )
@@ -112,12 +112,12 @@ def capture(cmd, env=None):
 
 # --------------------------------------------------------------------- Python
 
-def venv_python():
+def venv_python():  # path to python inside .venv (Windows puts it somewhere else)
     sub = "Scripts/python.exe" if os.name == "nt" else "bin/python"
     return VENV / sub
 
 
-def ensure_python_env():
+def ensure_python_env():  # makes .venv if needed and installs requirements.txt
     header("Python environment")
     if sys.version_info < (3, 10):
         fail(f"Python {sys.version.split()[0]} is too old. Install Python 3.10+ (the project uses 3.14).")
@@ -151,7 +151,7 @@ def docker_state():
     return "running" if result.returncode == 0 else "stopped"
 
 
-def docker_help(state):
+def docker_help(state):  # tells them how to install or start Docker
     if state == "missing":
         fail("Docker isn't installed on this computer.")
         info("Docker runs the local database. Install Docker Desktop, then run this again:")
@@ -205,7 +205,7 @@ def supabase_cmd():
     return None
 
 
-def supabase_help():
+def supabase_help():  # tells them how to get the Supabase CLI
     fail("The Supabase CLI isn't available.")
     info("Easiest fix: install Node.js (https://nodejs.org) - this launcher then uses")
     info("`npx supabase` automatically, nothing else to install.")
@@ -219,7 +219,7 @@ def supabase_help():
         info("Or see https://supabase.com/docs/guides/local-development/cli/getting-started")
 
 
-def parse_env_output(text):
+def parse_env_output(text):  # turns KEY=value lines into a dict
     values = {}
     for line in text.splitlines():
         if "=" not in line or line.lstrip().startswith("#"):
@@ -229,7 +229,7 @@ def parse_env_output(text):
     return values
 
 
-def local_status(sb):
+def local_status(sb):  # None if local Supabase isn't running
     result = capture(sb + ["status", "-o", "env"])
     if result.returncode != 0:
         return None
@@ -284,7 +284,7 @@ def start_local_db():
     return env, status.get("STUDIO_URL", DEFAULT_STUDIO_URL)
 
 
-def stop_local_db():
+def stop_local_db():  # shuts down the Docker containers
     sb = supabase_cmd()
     if sb:
         info("Stopping local Supabase...")
@@ -293,7 +293,7 @@ def stop_local_db():
 
 # ------------------------------------------------------------------- Live DB
 
-def read_dotenv():
+def read_dotenv():  # reads .env ourselves since python-dotenv might not be installed yet
     values = {}
     path = ROOT / ".env"
     if not path.exists():
@@ -330,7 +330,7 @@ def use_live_db():
 
 # ----------------------------------------------------------------------- Run
 
-def open_when_ready(url):
+def open_when_ready(url):  # opens the browser once /health answers, in the background
     def worker():
         for _ in range(60):
             try:
@@ -345,7 +345,7 @@ def open_when_ready(url):
     threading.Thread(target=worker, daemon=True).start()
 
 
-def run_app(py, env, open_url):
+def run_app(py, env, open_url):  # starts app.py with the database keys and waits until Ctrl+C
     header("Starting the app")
     info(f"App:  {cyan(APP_URL)}")
     info(dim("Press Ctrl+C to stop."))
@@ -361,7 +361,7 @@ def run_app(py, env, open_url):
     info("App stopped.")
 
 
-def choose_page(db_mode, studio_url, flag):
+def choose_page(db_mode, studio_url, flag):  # picks the page to open, from --open or by asking
     if flag:
         if flag == "studio":
             return studio_url if db_mode == "local" else None
@@ -393,7 +393,7 @@ def connect_database(db_mode):
         db_mode = "local"
 
 
-def main():
+def main():  # read flags, pick a database, set up python, run the app
     parser = argparse.ArgumentParser(description="Run the ticketing app locally.")
     parser.add_argument("--db", choices=["local", "live"], help="skip the database question")
     parser.add_argument(
@@ -430,7 +430,7 @@ def main():
             info("Leaving local Supabase running (stop it later with: supabase stop).")
 
 
-if __name__ == "__main__":
+if __name__ == "__main__":  # Ctrl+C before the app starts just says Cancelled
     try:
         main()
     except KeyboardInterrupt:
