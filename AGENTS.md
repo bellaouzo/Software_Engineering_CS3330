@@ -91,9 +91,9 @@ docs/                    # Team documents (Word docs, PDFs, spreadsheets)
   source of truth. Every schema change is a new migration; never edit an
   applied one. No `email` column on `profiles`, no status history table.
   → [database-schema.md](docs/guides/database-schema.md)
-- **Known issue, left on purpose:** the `tickets` UPDATE policy lets a ticket's
-  creator change its status (should be staff-only, Req 2.3.1). It's a planned
-  test case. Don't copy it, and don't fix it without asking the team.
+- **Ticket updates are staff-only** (F-001, Req 2.3.1, 4.1). Requesters create
+  and read their own tickets but can't change them. Don't add a creator clause
+  back to the update policy.
   → [database-schema.md](docs/guides/database-schema.md)
 - **Naming:** Python `snake_case`, constants `UPPER_SNAKE_CASE`, blueprints
   `<name>_bp`, URLs lowercase plural with hyphens, ticket IDs are UUIDs (no

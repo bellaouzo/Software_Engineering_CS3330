@@ -11,6 +11,5 @@ Summary in `AGENTS.md` > Working on a change.
 - Each test should be documented as its own numbered Test Plan, per the class
   Test Plan template — don't lump multiple tests into one plan. Test Plans are
   Word docs and go in `docs/` (e.g. `docs/test-plans/`), not in `docs/guides/`.
-- The known RLS issue (requesters can update their own ticket's status; see
-  `database-schema.md`) should become one of these test cases once the team
-  reaches testing.
+- The staff-only ticket update policy (F-001; see `database-schema.md`) is
+  verified by TP-004 (traces 6, 7) and TP-008.
