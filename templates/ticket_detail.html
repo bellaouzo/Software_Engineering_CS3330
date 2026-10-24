@@ -3,12 +3,14 @@
 {% block title %}{{ ticket.title }} · Ticketing System{% endblock %}
 
 {% block content %}
+  {# Title, current status, and who opened it #}
   <h1>{{ ticket.title }}</h1>
   <p class="lede">
     <span class="status-badge">{{ ticket.status }}</span>
     Opened by {{ ticket.profiles.name or ticket.profiles.username if ticket.profiles else 'unknown' }}
   </p>
 
+  {# Ticket details, the timestamp gets cut down to date and time #}
   <div class="sheet">
     <dl class="ticket-fields">
       <dt>Category</dt>
@@ -21,6 +23,7 @@
     <p class="ticket-description">{{ ticket.description or 'No description.' }}</p>
   </div>
 
+  {# Only staff get the status dropdown (Req 2.3.1) #}
   {% if is_staff %}
     <form class="sheet" method="post" action="{{ url_for('tickets.update_ticket_status', ticket_id=ticket.id) }}">
       <label for="status">Status</label>
@@ -33,6 +36,7 @@
     </form>
   {% endif %}
 
+  {# Comments come in oldest first (Req 3.2.1) #}
   <h2>Comments</h2>
   {% if comments %}
     <ul class="comment-list">
@@ -50,6 +54,7 @@
     <p class="lede">No comments yet.</p>
   {% endif %}
 
+  {# Anyone who can see the ticket can comment (Req 3.1.1) #}
   <form class="sheet comment-form" method="post" action="{{ url_for('tickets.ticket_detail', ticket_id=ticket.id) }}">
     <label for="text">Comment</label>
     <textarea id="text" name="text" rows="3" required></textarea>

@@ -23,6 +23,7 @@ def get_user_client() -> Client:
     Raises AuthError if the saved login is no longer valid, and SupabaseException
     if the app is missing its Supabase settings.
     """
+    # Log the client in as the user, then save the refreshed tokens back
     client = get_supabase_client()
     result = client.auth.set_session(session["access_token"], session["refresh_token"])
     session["access_token"] = result.session.access_token

@@ -1,0 +1,35 @@
+{# Requester view: only their own tickets (Req 2.2.1, 4.1) #}
+<h1>My dashboard</h1>
+<p class="lede">Hi {{ profile.name or profile.username }}. Here's where your tickets stand.</p>
+
+<ul class="stat-grid">
+  <li class="stat-tile">
+    <span class="stat-tile__count">{{ open_count }}</span>
+    <span class="stat-tile__label">Open</span>
+  </li>
+  <li class="stat-tile">
+    <span class="stat-tile__count">{{ counts['Resolved'] + counts['Closed'] }}</span>
+    <span class="stat-tile__label">Resolved or closed</span>
+  </li>
+  <li class="stat-tile">
+    <span class="stat-tile__count">{{ total_count }}</span>
+    <span class="stat-tile__label">Total</span>
+  </li>
+</ul>
+
+<div class="actions">
+  <a class="button" href="{{ url_for('tickets.new_ticket') }}">New ticket</a>
+  <a class="button button-quiet" href="{{ url_for('tickets.list_tickets') }}">View all my tickets</a>
+</div>
+
+{# Their tickets that aren't resolved or closed yet #}
+<h2>My open tickets</h2>
+{% if open_tickets %}
+  <ul class="ticket-list">
+    {% with show_updated=true %}
+      {% for ticket in open_tickets %}{% include "partials/_ticket_row.html" %}{% endfor %}
+    {% endwith %}
+  </ul>
+{% else %}
+  <div class="sheet"><p>You don't have any open tickets.</p></div>
+{% endif %}

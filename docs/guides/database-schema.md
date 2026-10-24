@@ -28,14 +28,13 @@ exact rules). Don't bypass RLS from app code by using the service-role key for
 normal user requests — query with `get_user_client()` instead (see
 `auth-helpers-examples.md`).
 
-### Known issue — do not treat as correct, scheduled to be fixed during testing
+### Ticket updates are staff-only
 
-The `tickets` UPDATE policy currently allows the ticket's own creator (not just
-staff) to update it, which would let a requester change their own ticket's status.
-Per Req 2.3.1, status changes should be staff-only. This is a known gap,
-intentionally left for the team's test phase (it doubles as a real test case) —
-don't copy this pattern elsewhere, and don't "fix" it without checking with the
-team first, since it's being tracked deliberately.
+`tickets` UPDATE is allowed for staff only (`"Staff update tickets"`, from
+`20261024000711_staff_only_ticket_updates.sql`, fixing F-001 / Req 2.3.1, 4.1).
+It replaced the old "Creators and staff update tickets" policy, which let a
+requester change their own ticket's status. Requesters can still insert and read
+their own tickets. Don't add a creator clause back to the update policy.
 
 ## No status history table
 
@@ -49,8 +48,7 @@ Historical notes belong in `comments`, not a new table.
   `YYYYMMDDHHMMSS_descriptive_name.sql` (e.g.
   `20260926005830_drop_profiles_email.sql`). Never rename or renumber by hand.
 - Don't alter existing migrations after they've been applied — add a new
-  migration file instead, even for small fixes (including the known RLS issue
-  above, when the team is ready to fix it).
+  migration file instead, even for small fixes.
 - Seed data (tickets/comments) lives in `supabase/seed.sql`; profiles come from
   the auth trigger, not the seed.
 

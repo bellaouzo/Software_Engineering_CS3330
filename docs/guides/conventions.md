@@ -82,6 +82,12 @@ pass the typed values back to the template (never the password), like
   framework or library (Bootstrap, Pico.css, Tailwind, etc.). Our own CSS lives
   in `static/css/app.css`.
 - `base.html` is the only layout; every page extends it.
+- Ticket rows in a `.ticket-list` come from `templates/partials/_ticket_row.html`
+  (used by `tickets.html` and the dashboard). Turn on extra details with
+  `{% with show_owner=..., show_updated=... %}`.
+- The dashboard (`/`) is role-based: logged-out visitors get the welcome page,
+  requesters get `partials/dashboard/_requester.html`, staff get
+  `partials/dashboard/_staff.html`.
 - The app's display name is **Ticketing System** (header brand and every page
   title in `templates/`).
 

@@ -42,6 +42,13 @@ changing `role` to `staff` on their `profiles` row, or run in the SQL Editor:
 update public.profiles set role = 'staff' where username = 'their_username';
 ```
 
+## Staff-only ticket updates
+
+`20261024000711_staff_only_ticket_updates.sql` makes ticket updates staff-only
+(F-001). Apply it to the live project with `supabase db push`, then check
+Dashboard > Authentication > Policies > `tickets`: the update policy should be
+"Staff update tickets", and "Creators and staff update tickets" should be gone.
+
 ## Updating this file
 
 If auth setup changes (new migration, new Supabase setting, new env var), update
