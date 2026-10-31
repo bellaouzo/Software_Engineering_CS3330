@@ -49,7 +49,8 @@ Historical notes belong in `comments`, not a new table.
   `20260926005830_drop_profiles_email.sql`). Never rename or renumber by hand.
 - Don't alter existing migrations after they've been applied — add a new
   migration file instead, even for small fixes.
-- Seed data (tickets/comments) lives in `supabase/seed.sql`; profiles come from
-  the auth trigger, not the seed.
+- Demo data comes from `seed_demo_data.py`, not `supabase/seed.sql` (accounts
+  have to be made through Supabase Auth, which SQL seeds can't do cleanly). See
+  `demo-data.md`. Profiles still come from the auth trigger.
 
 Database naming rules are in `naming-conventions.md`.
