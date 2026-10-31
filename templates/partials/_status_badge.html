@@ -1,0 +1,3 @@
+{# Status box for one ticket. Used by _ticket_row.html and ticket_detail.html.
+   The modifier class comes from the status ("In Progress" -> status-badge--in-progress) so each one gets its own color #}
+<span class="status-badge status-badge--{{ ticket.status|lower|replace(' ', '-') }}">{{ ticket.status }}</span>

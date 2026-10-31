@@ -6,7 +6,7 @@
   {# Title, current status, and who opened it #}
   <h1>{{ ticket.title }}</h1>
   <p class="lede">
-    <span class="status-badge">{{ ticket.status }}</span>
+    {% include "partials/_status_badge.html" %}
     Opened by {{ ticket.profiles.name or ticket.profiles.username if ticket.profiles else 'unknown' }}
   </p>
 
@@ -44,6 +44,8 @@
         <li>
           <div class="ticket-meta">
             {{ comment.profiles.name or comment.profiles.username if comment.profiles else 'Unknown' }}
+            {# Staff replies get a tag so requesters can tell who answered #}
+            {% if comment.profiles and comment.profiles.role == 'staff' %}<span class="role-tag">Staff</span>{% endif %}
             · {{ comment.timestamp[:16].replace('T', ' ') }} UTC
           </div>
           <p>{{ comment.text }}</p>

@@ -94,7 +94,18 @@ pass the typed values back to the template (never the password), like
   requesters get `partials/dashboard/_requester.html`, staff get
   `partials/dashboard/_staff.html`.
 - The app's display name is **Ticketing System** (header brand and every page
-  title in `templates/`).
+  title in `templates/`). Don't use location wording like "on campus".
+- `base.html` shows each flash as `<p class="flash flash--success">` or
+  `flash--error` (errors get `role="alert"`). A flash with no category falls
+  back to the plain yellow `.flash`.
+- Status badges come from `templates/partials/_status_badge.html`. It adds a
+  modifier from the status (`In Progress` → `status-badge--in-progress`), and
+  each of the five statuses has its own color in `app.css`.
+- Staff comments get a `<span class="role-tag">Staff</span>` next to the name
+  (from `comment.profiles.role`).
+- Phone styles (`@media (max-width: 640px)`) are the last section of `app.css`.
+  Add new small-screen rules there. Long text (titles, descriptions, comments)
+  uses `overflow-wrap: anywhere` so the page never scrolls sideways.
 
 ## Requirement IDs
 

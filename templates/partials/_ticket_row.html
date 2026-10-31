@@ -10,5 +10,5 @@
       {% if show_updated %}· Updated {{ ticket.updated_at[:16].replace('T', ' ') }} UTC{% endif %}
     </div>
   </div>
-  <span class="status-badge">{{ ticket.status }}</span>
+  {% include "partials/_status_badge.html" %}
 </li>
