@@ -16,6 +16,7 @@ here is not the whole rule.
 | [testing.md](docs/guides/testing.md) | Writing or running Test Plans |
 | [auth-helpers-examples.md](docs/guides/auth-helpers-examples.md) | Using `@require_login`, `@require_staff`, `get_user_client()` |
 | [supabase-live-auth-setup.md](docs/guides/supabase-live-auth-setup.md) | Setting up login on the live Supabase project |
+| [demo-data.md](docs/guides/demo-data.md) | Loading demo accounts and tickets for testing and the final demo |
 
 ## Project overview
 
@@ -47,11 +48,16 @@ before choosing Live. `.env` needs `FLASK_SECRET_KEY`, `SUPABASE_URL`,
 `SUPABASE_KEY`. Get them from a teammate, never guess them, never commit them.
 → Manual setup, all flags, prerequisites: [setup-and-running.md](docs/guides/setup-and-running.md)
 
+Demo accounts and tickets: `python seed_demo_data.py --db local` (or `live`).
+→ [demo-data.md](docs/guides/demo-data.md)
+
 ## Folder structure
 
 ```
 app.py                  # Flask app factory (create_app), loads .env, registers routes, /health check
 dev.py                  # One-command interactive launcher (pick local/live DB, start app, open browser)
+seed_demo_data.py       # Adds/removes demo accounts, tickets, comments (admin script, service-role key)
+demo_content.py         # Names, ticket ideas, and comment text used by seed_demo_data.py
 supabase_client.py      # get_supabase_client() (anon) and get_user_client() (acts as the logged-in user, RLS applies)
 auth_helpers.py         # @require_login and @require_staff decorators for route functions
 routes/                 # BACK END - Flask Blueprints
@@ -66,7 +72,7 @@ static/
   js/app.js
 supabase/
   migrations/             # Timestamp-named SQL migrations - the source of truth for schema
-  seed.sql                 # Seed data (tickets/comments) - profiles come from auth triggers
+  seed.sql                 # Local seed hook (empty); demo data comes from seed_demo_data.py
   config.toml
 docs/                    # Team documents (Word docs, PDFs, spreadsheets)
   guides/                 # Markdown guides for developers and AI tools (linked above); may nest into topic folders
@@ -80,7 +86,8 @@ docs/                    # Team documents (Word docs, PDFs, spreadsheets)
 - **Query as the user:** put `@require_login` / `@require_staff` under the route
   decorator, and use `get_user_client()` so RLS applies. Use
   `get_supabase_client()` only when nobody is logged in. Never use the
-  service-role key for user requests. → [auth-helpers-examples.md](docs/guides/auth-helpers-examples.md)
+  service-role key for user requests (only the `seed_demo_data.py` admin script
+  uses it). → [auth-helpers-examples.md](docs/guides/auth-helpers-examples.md)
 - **Login is username + password.** Usernames map to placeholder
   `<username>@example.com` emails; email confirmation stays off.
   → [conventions.md](docs/guides/conventions.md)
@@ -111,7 +118,7 @@ jobs. At **must split**, split before adding anything more. Count with `wc -l`.
 | --- | --- | --- |
 | Route module (`routes/*.py`) | 200 | 300 |
 | Other Python module | 200 | 300 |
-| Standalone script (`dev.py`) | 300 | 400 |
+| Standalone script (`dev.py`, `seed_demo_data.py`) | 300 | 400 |
 | Any Python function | 30 | 50 |
 | Jinja template | 80 | 150 |
 | CSS file | 400 | 600 |
