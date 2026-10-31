@@ -13,6 +13,8 @@ logger = logging.getLogger(__name__)
 # Must match the status values listed in AGENTS.md.
 TICKET_STATUSES = ["Submitted", "Acknowledged", "In Progress", "Resolved", "Closed"]
 TICKET_CATEGORIES = ["Plumbing", "Electrical", "HVAC", "Furniture", "Cleaning", "Other"]
+# Only what a ticket row shows (_ticket_row.html), so list pages load less (Req 5.1).
+TICKET_LIST_COLUMNS = "id, title, category, location, status, updated_at, profiles(name, username)"
 
 # Messages we flash when something goes wrong
 DB_ERROR = "Could not reach the database. Try again in a moment."
@@ -56,7 +58,7 @@ def list_tickets():
         query = (
             get_user_client()
             .table("tickets")
-            .select("*, profiles(name, username)")
+            .select(TICKET_LIST_COLUMNS)
             .order("updated_at", desc=True)
         )
         # RLS should already hide other users' tickets; filter here too so a

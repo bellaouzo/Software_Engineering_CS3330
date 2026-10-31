@@ -36,6 +36,15 @@ It replaced the old "Creators and staff update tickets" policy, which let a
 requester change their own ticket's status. Requesters can still insert and read
 their own tickets. Don't add a creator clause back to the update policy.
 
+## Indexes
+
+Besides the primary keys: `tickets` has `created_by`, `status`, and
+`updated_at desc` (the list sort order, added for Req 5.1 in
+`20261031001320_add_tickets_updated_at_index.sql`); `comments` has `ticket_id`,
+`user_id`, and `timestamp`; `profiles` has a unique index on `lower(username)`.
+If you add a new way to filter or sort tickets, add an index for it in a new
+migration.
+
 ## No status history table
 
 Status changes just update `tickets.status` and `tickets.updated_at` directly.
