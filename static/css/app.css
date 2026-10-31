@@ -1,5 +1,5 @@
 /* ==========================================================================
-   Ticket Tracker – Main Stylesheet
+   Ticketing System – Main Stylesheet
    Light "paper and ink" theme with a dark top bar and a rust-orange accent.
    Sections: tokens → base → layout → components → states → responsive
    ========================================================================== */
@@ -16,6 +16,9 @@
   --stamp-ink: #fff8f4;  /* text color on top of the accent */
   --focus: #1f6f8b;      /* links and keyboard focus ring */
   --error: #a3261b;      /* inline form errors (Req 6.1) */
+  --error-bg: #fbe4e1;   /* error flash background */
+  --success: #2e6b3f;    /* success flash border */
+  --success-bg: #e2f2e6; /* success flash background */
 }
 
 /* ---------- Base / reset ---------- */
@@ -71,6 +74,12 @@ nav a {
   text-decoration: none;
 }
 
+/* Same hover as the Log out button below */
+nav a:hover {
+  color: white;
+  text-decoration: underline;
+}
+
 /* Log out is a POST form; make its button look like a nav link */
 .nav-logout {
   margin: 0;
@@ -112,6 +121,7 @@ h1 {
   font-size: 2rem;
   font-weight: 600;
   line-height: 1.15;         /* tighter leading suits large headings */
+  overflow-wrap: anywhere;   /* ticket titles go here, a long URL can't widen the page */
 }
 
 /* Intro paragraph and side notes: muted, capped to a readable line length */
@@ -187,6 +197,12 @@ button,
   cursor: pointer;
 }
 
+/* Slightly darker on hover so it feels clickable */
+button:hover,
+.button:hover {
+  filter: brightness(0.92);
+}
+
 /* Secondary/outline variant: transparent with a 1px inset border */
 .button-quiet {
   background: transparent;
@@ -194,21 +210,34 @@ button,
   box-shadow: inset 0 0 0 1px var(--line);
 }
 
+/* Quiet buttons get a light tint instead of darkening */
+.button-quiet:hover {
+  background: var(--sheet);
+  filter: none;
+}
+
 /* ---------- Flash messages (notices/alerts) ---------- */
+/* One <p class="flash flash--success|error"> per message, see base.html */
 .flash {
-  margin-bottom: 1rem;
+  margin: 0 0 1rem;
   padding: 0.7rem 0.9rem;
-  background: #fff4d8;       /* soft yellow notice */
+  background: #fff4d8;       /* soft yellow, only used if a flash has no category */
   border: 1px solid #e2c57a;
 }
 
-.flash p {
-  margin: 0;                 /* spacing handled by the sibling rule below */
+/* Stack messages closer together than other content */
+.flash + .flash {
+  margin-top: -0.5rem;
 }
 
-/* Add space only between consecutive messages */
-.flash p + p {
-  margin-top: 0.35rem;
+.flash--success {
+  background: var(--success-bg);
+  border-color: var(--success);
+}
+
+.flash--error {
+  background: var(--error-bg);
+  border-color: var(--error);
 }
 
 /* ---------- Ticket list ---------- */
@@ -236,13 +265,21 @@ button,
   border-top: 0;
 }
 
+/* Ticket titles a bit heavier so rows are easy to scan.
+   overflow-wrap stops a long title or URL from making the page scroll sideways */
+.ticket-list a {
+  font-weight: 500;
+  overflow-wrap: anywhere;
+}
+
 /* Small gray line under a ticket title (category, location, etc.) */
 .ticket-meta {
   color: var(--muted);
   font-size: 0.9rem;
+  overflow-wrap: anywhere;
 }
 
-/* Little box with the ticket status */
+/* Little box with the ticket status (partials/_status_badge.html) */
 .status-badge {
   align-self: flex-start;
   padding: 0.1rem 0.5rem;
@@ -250,6 +287,42 @@ button,
   font-size: 0.85rem;
   font-weight: 500;
   white-space: nowrap;
+}
+
+/* One muted color per status, in workflow order */
+.status-badge--submitted {
+  background: #fdeee6;
+  border-color: var(--stamp);
+}
+
+.status-badge--acknowledged {
+  background: #fff4d8;
+  border-color: #e2c57a;
+}
+
+.status-badge--in-progress {
+  background: #e1eff5;
+  border-color: var(--focus);
+}
+
+.status-badge--resolved {
+  background: var(--success-bg);
+  border-color: var(--success);
+}
+
+.status-badge--closed {
+  background: #eceff1;
+  color: var(--muted);
+}
+
+/* "Staff" tag next to a staff member's name on a comment */
+.role-tag {
+  margin-left: 0.3rem;
+  padding: 0 0.4rem;
+  background: var(--stamp);
+  color: var(--stamp-ink);
+  font-size: 0.75rem;
+  font-weight: 600;
 }
 
 /* ---------- Ticket detail ---------- */
@@ -274,6 +347,7 @@ button,
 .ticket-description {
   margin: 0;
   white-space: pre-wrap;
+  overflow-wrap: anywhere;
 }
 
 /* ---------- Comments ---------- */
@@ -300,6 +374,7 @@ button,
 .comment-list p {
   margin: 0.3rem 0 0;
   white-space: pre-wrap;
+  overflow-wrap: anywhere;
 }
 
 /* A bit of space between the comments and the form */
@@ -353,16 +428,6 @@ button,
   outline-offset: 2px;
 }
 
-/* ---------- Responsive ---------- */
-
-/* Stack the brand above the nav on small screens */
-@media (max-width: 640px) {
-  .topbar {
-    align-items: flex-start;
-    flex-direction: column;
-  }
-}
-
 /* ---------- Inline form errors (Req 6.1) ---------- */
 /* .field-hint is up in the forms section, these are the error versions */
 
@@ -379,4 +444,61 @@ input.has-error,
 textarea.has-error,
 select.has-error {
   border-color: var(--error);
+}
+
+/* ---------- Responsive (phones) ---------- */
+/* Kept last so these rules win over the desktop ones above */
+@media (max-width: 640px) {
+  /* Stack the brand above the nav */
+  .topbar {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .brand {
+    font-size: 1.1rem;
+  }
+
+  /* Taller nav links so they are easier to tap */
+  nav a,
+  .nav-logout button {
+    padding: 0.35rem 0;
+  }
+
+  main {
+    padding-top: 1.25rem;
+  }
+
+  h1 {
+    font-size: 1.6rem;
+  }
+
+  /* Two count boxes per row */
+  .stat-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  /* Title on top, status badge under it */
+  .ticket-list li {
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+
+  /* Field name above its value instead of side by side */
+  .ticket-fields {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+
+  .ticket-fields dd {
+    margin-bottom: 0.5rem;
+  }
+
+  /* Full-width buttons in forms and button rows */
+  .sheet button,
+  .actions .button {
+    width: 100%;
+    text-align: center;
+  }
 }

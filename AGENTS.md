@@ -66,7 +66,7 @@ routes/                 # BACK END - Flask Blueprints
   tickets.py               # tickets_bp: /tickets, /tickets/new, /tickets/<id>, POST /tickets/<id>/status (staff)
   dashboard.py              # dashboard_bp: / and /dashboard (both -> home), role-based: requester vs staff view
 templates/               # FRONT END - HTML + Jinja2, extend base.html
-  partials/               # shared bits pulled in with {% include %} (_ticket_row.html, dashboard/)
+  partials/               # shared bits pulled in with {% include %} (_ticket_row.html, _status_badge.html, dashboard/)
 static/
   css/app.css
   js/app.js

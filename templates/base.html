@@ -30,15 +30,12 @@
     </nav>
   </header>
   <main>
-    {# Flash messages from the routes (errors, "Ticket submitted.", etc.) #}
-    {% with messages = get_flashed_messages() %}
-      {% if messages %}
-        <div class="flash" role="status">
-          {% for message in messages %}
-            <p>{{ message }}</p>
-          {% endfor %}
-        </div>
-      {% endif %}
+    {# Flash messages from the routes. Category is "success" (green) or "error" (red);
+       errors use role="alert" so screen readers announce them right away #}
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% for category, message in messages %}
+        <p class="flash flash--{{ category }}" role="{{ 'alert' if category == 'error' else 'status' }}">{{ message }}</p>
+      {% endfor %}
     {% endwith %}
     {# Each page puts its stuff here #}
     {% block content %}{% endblock %}
