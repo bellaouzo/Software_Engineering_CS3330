@@ -23,6 +23,10 @@ data) in one function, per Flask convention — don't split these into two route
 - Every `flash()` passes a category: `"success"` for things that worked
   ("Ticket submitted.") and `"error"` for anything that failed or was blocked.
   Templates read them with `get_flashed_messages(with_categories=true)`.
+- **List pages select only what a row shows:** the ticket list and dashboards
+  use `TICKET_LIST_COLUMNS` from `routes/tickets.py` (the fields
+  `_ticket_row.html` uses), not `*` (Req 5.1). If you add a field to the row,
+  add it there too. The ticket detail page still loads every column.
 - The comments query on the ticket page joins `profiles(name, username, role)`,
   so a template can tell staff replies apart (`comment.profiles.role`).
 - **Protecting routes and querying as the user:** put `@require_login` (or

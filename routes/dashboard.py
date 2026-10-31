@@ -3,7 +3,7 @@ import logging
 from flask import Blueprint, flash, redirect, render_template, session, url_for
 from supabase import AuthError, PostgrestAPIError, SupabaseException
 
-from routes.tickets import TICKET_STATUSES
+from routes.tickets import TICKET_LIST_COLUMNS, TICKET_STATUSES
 from supabase_client import get_user_client
 
 dashboard_bp = Blueprint("dashboard", __name__)
@@ -41,7 +41,7 @@ def _load_dashboard():
     is_staff = profile["role"] == "staff"
     query = (
         client.table("tickets")
-        .select("id, title, category, location, status, updated_at, profiles(name, username)")
+        .select(TICKET_LIST_COLUMNS)
         .order("updated_at", desc=True)
     )
     # RLS already does this, but filter requesters to their own tickets anyway (same as F-004 fix)
