@@ -58,6 +58,11 @@ Everyone (and their AI tool) needs these to use the branch/PR workflow in
 If a prerequisite is missing, an AI agent should tell the user what's missing and
 how to fix it rather than failing silently or working around it.
 
+## Demo data
+
+To fill a database with demo accounts and tickets, see `demo-data.md`
+(`python seed_demo_data.py --db local`).
+
 ## Live Supabase
 
 One-time steps on the shared Supabase project for login and registration are in

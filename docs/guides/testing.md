@@ -11,5 +11,8 @@ Summary in `AGENTS.md` > Working on a change.
 - Each test should be documented as its own numbered Test Plan, per the class
   Test Plan template — don't lump multiple tests into one plan. Test Plans are
   Word docs and go in `docs/` (e.g. `docs/test-plans/`), not in `docs/guides/`.
+- TP-010, TP-012, and TP-013 run against the demo data from
+  `seed_demo_data.py`, so everyone tests with the same accounts and tickets
+  (see `demo-data.md`). Note the `--tickets` count used in the Test Plan.
 - The staff-only ticket update policy (F-001; see `database-schema.md`) is
   verified by TP-004 (traces 6, 7) and TP-008.

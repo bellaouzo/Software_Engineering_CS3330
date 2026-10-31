@@ -1,2 +1,4 @@
 -- Profiles are created from auth.users by handle_new_user.
--- Seed tickets and comments here after those users exist.
+-- Demo accounts, tickets, and comments come from seed_demo_data.py instead of
+-- this file, because accounts have to be made through Supabase Auth. After a
+-- `supabase db reset`, run: python seed_demo_data.py --db local

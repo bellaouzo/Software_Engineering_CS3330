@@ -25,6 +25,7 @@ the class deliverables and stay out of `guides/`.
   - `testing.md` - cross-functional testing and Test Plans
   - `auth-helpers-examples.md` - how routes use the login and database helpers
   - `supabase-live-auth-setup.md` - live Supabase steps for login
+  - `demo-data.md` - demo accounts, tickets, and comments for testing and the demo
 
 ## Suggested layout
 
